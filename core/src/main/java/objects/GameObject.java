@@ -1,8 +1,9 @@
-package io.github.some_example_name;
+package objects;
 
 import static io.github.some_example_name.GameSettings.SCALE;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -24,6 +25,7 @@ public class GameObject {
         this.width = width;
         this.height = height;
         this.cBits = cBits;
+
 
         texture = new Texture(texturePath);
         body = createBody(x, y, world);
@@ -74,4 +76,5 @@ public class GameObject {
         body.setTransform(x * SCALE, y * SCALE, 0);
         return body;
     }
+
 }

@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class MyGdxGame extends Game {
     public SpriteBatch batch;
     public OrthographicCamera camera;
-    World world;
+    public World world;
     float accumulator = 0;
 
     public GameScreen gameScreen;
@@ -33,7 +33,7 @@ public class MyGdxGame extends Game {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT);
 
-        gameScreen = new GameScreen(this, batch);
+        gameScreen = new GameScreen(this);
 
         setScreen(gameScreen);
     }
