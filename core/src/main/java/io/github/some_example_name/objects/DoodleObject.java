@@ -31,11 +31,11 @@ public class DoodleObject extends GameObject{
         this.y = y;
     }
 
-    public void move() {
+    public void move(int xs,int ys) {
 
         body.applyForceToCenter(new Vector2(
-                    0,
-                500 * GameSettings.SHIP_FORCE_RATIO),
+                    xs,
+                ys ),
             true
         );
     }
