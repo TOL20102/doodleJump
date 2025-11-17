@@ -1,4 +1,4 @@
-package objects;
+package io.github.some_example_name.objects;
 
 import static io.github.some_example_name.GameSettings.SCALE;
 

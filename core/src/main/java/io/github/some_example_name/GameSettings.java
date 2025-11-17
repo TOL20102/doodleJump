@@ -9,6 +9,8 @@ public class GameSettings {
     public static final int VELOCITY_ITERATIONS = 6;
     public static final int POSITION_ITERATIONS = 6;
 
+    public static float SHIP_FORCE_RATIO = 10;
+
     public static final short DOODLE_BIT = 1;
     public static final short PLATE_BIT = 2;
     public static final short MONSTER_BIT = 4;
