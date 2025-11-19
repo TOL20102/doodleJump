@@ -31,17 +31,25 @@ public class DoodleObject extends GameObject{
         this.y = y;
     }
 
-    public void move(int xs,int ys) {
-
-        body.applyForceToCenter(new Vector2(
+    public void move(int xs,int ys, boolean check) {
+        if(check) {
+            body.applyForceToCenter(new Vector2(
                     xs,
-                ys ),
-            true
-        );
+                    ys),
+                true
+            );
+        }
+
+        else {
+            body.applyLinearImpulse(xs,ys,x,y,true);
+        }
+
+
     }
 
     @Override
     public void draw(SpriteBatch batch) {
+
         putInFrame();
         super.draw(batch);
     }

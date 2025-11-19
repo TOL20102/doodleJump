@@ -4,10 +4,13 @@ import static io.github.some_example_name.GameState.PAUSED;
 import static io.github.some_example_name.GameState.PLAYING;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 
@@ -20,44 +23,47 @@ import io.github.some_example_name.objects.DoodleObject;
 public class GameScreen extends ScreenAdapter {
     MyGdxGame myGdxGame;
     ImageView backGround, topBlackoutView, fullBlackoutView;
-    ButtonView buttonView, buttonView1, pauseButton, homeButton, continueButton;
+    ButtonView buttonView, buttonView1, pauseButton, homeButton, continueButton, buttonView2;
     TextView pauseTextView;
+    Object camera;
+    GameSession gameSession;
+    Box2DDebugRenderer debugRenderer;
     int r = 0;
     Batch batch;
-    GameSession gameSession;
     DoodleObject doodleObject;
-
-    public GameScreen(MyGdxGame myGdxGame) {
+    public GameScreen(MyGdxGame myGdxGame ) {
         this.myGdxGame = myGdxGame;
         batch = myGdxGame.batch;
+        Box2D.init();
         topBlackoutView = new ImageView(0, 1180, 720, 100, GameResources.BLACKOUT_TOP_IMG_PATH);
         fullBlackoutView = new ImageView(0, 0, 720, 1280, GameResources.PAUSE_SCREEN_IMG_PATH);
         doodleObject = new DoodleObject(GameResources.DOODLE_PATH, 100, 150, 920 / 3, 552 / 3, GameSettings.DOODLE_BIT, myGdxGame.world);
         backGround = new ImageView(0, 0, 720, 1280, GameResources.BACKGROUND_PATH);
         pauseButton = new ButtonView(605, 1200, 46, 54, GameResources.PAUSE_IMG_PATH);
         buttonView = new ButtonView(0, 0, 630 / 3, 630 / 3, GameResources.BUTTON_FLIPED_PATH);
+        buttonView2 = new ButtonView(0, 210, 630 / 3, 630 / 3, GameResources.BUTTON_FLIPED_PATH);
         gameSession = new GameSession();
         buttonView1 = new ButtonView(510, 0, 630 / 3, 630 / 3, GameResources.BUTTON_PATH);
+        debugRenderer = new Box2DDebugRenderer();
         pauseTextView = new TextView(myGdxGame.largeWhiteFont, 290, 950, "Pause");
         homeButton = new ButtonView(190, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Home");
         continueButton = new ButtonView(390, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Continue");
+
     }
 
     @Override
     public void render(float delta) {
-
         myGdxGame.stepWorld();
         draw();
     }
-
     private void draw() {
         myGdxGame.camera.update();
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
         ScreenUtils.clear(Color.CLEAR);
-        handleInput();
 
+
+        doodleObject.jump();
         r++;
-
 
         batch.begin();
 
@@ -67,6 +73,7 @@ public class GameScreen extends ScreenAdapter {
         pauseButton.draw(myGdxGame.batch);
         buttonView.draw(myGdxGame.batch);
         buttonView1.draw(myGdxGame.batch);
+        buttonView2.draw(myGdxGame.batch);
         if (gameSession.state == PLAYING) {
 
         } else if (gameSession.state == PAUSED) {
@@ -76,12 +83,10 @@ public class GameScreen extends ScreenAdapter {
             continueButton.draw(myGdxGame.batch);
         }
 
-
         batch.end();
 
-
+        handleInput();
     }
-
     private void handleInput() {
         if (Gdx.input.isTouched()) {
             myGdxGame.touch = myGdxGame.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
@@ -89,10 +94,13 @@ public class GameScreen extends ScreenAdapter {
                 case PLAYING:
 
                     if (buttonView.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
-                        doodleObject.move(-100, 0);
+                        doodleObject.move(-10, 0, false);
                     }
                     if (buttonView1.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
-                        doodleObject.move(100, 0);
+                        doodleObject.move(10, 0, false);
+                    }
+                    if (buttonView2.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
+                        doodleObject.move(0, 300, false);
                     }
                     if (pauseButton.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
                         gameSession.pauseGame();
@@ -101,7 +109,7 @@ public class GameScreen extends ScreenAdapter {
 
                 case PAUSED:
                     if (homeButton.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
-
+                        myGdxGame.setScreen(myGdxGame.menuScreen);
                     }
                     if (continueButton.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
                         gameSession.resumeGame();
