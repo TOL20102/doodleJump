@@ -3,7 +3,6 @@ package io.github.some_example_name.objects;
 import static io.github.some_example_name.GameSettings.SCALE;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -15,53 +14,59 @@ import com.badlogic.gdx.physics.box2d.World;
 public class GameObject {
     public short cBits;
 
-    public int width;
-    public int height;
+    public float width;
+    public float height;
 
     public Body body;
     Texture texture;
+    World world;
 
-    GameObject(String texturePath, int x, int y, int width, int height, short cBits, World world) {
+
+    public GameObject(String texturePath, float x, float y, float width, float height, short cBits, World world, BodyDef.BodyType bodyType) {
         this.width = width;
         this.height = height;
         this.cBits = cBits;
-
-
-        texture = new Texture(texturePath);
-        body = createBody(x, y, world);
+        this.world = world;
+        this.texture = new Texture(texturePath);
+        this.body = createBody(x, y, bodyType);
     }
 
     public void draw(SpriteBatch batch) {
+
         batch.draw(texture,
-            getX() - (width / 2f),
-            getY()- (height / 2f),
+            (body.getPosition().x * SCALE) - (width / 2f),
+            (body.getPosition().y * SCALE) - (height / 2f),
             width,
             height);
     }
-    public int getX() {
-        return (int) (body.getPosition().x / SCALE);
+
+
+    public float getX() {
+        return (body.getPosition().x * SCALE) - (width / 2f);
     }
 
-    public int getY() {
-        return (int) (body.getPosition().y / SCALE);
+    public float getY() {
+        return (body.getPosition().y * SCALE) - (height / 2f);
     }
 
-    public void setX(int x) {
-        body.setTransform(x * SCALE, body.getPosition().y, 0);
+
+    public void setX(float x) {
+        body.setTransform((x + width / 2f) / SCALE, body.getPosition().y, 0);
     }
 
-    public void setY(int y) {
-        body.setTransform(body.getPosition().x, y * SCALE, 0);
+    public void setY(float y) {
+        body.setTransform(body.getPosition().x, (y + height / 2f) / SCALE, 0);
     }
 
-    private Body createBody(float x, float y, World world) {
+    private Body createBody(float x, float y, BodyDef.BodyType bodyType) {
         BodyDef def = new BodyDef();
-        def.type = BodyDef.BodyType.DynamicBody;
+        def.type = bodyType;
         def.fixedRotation = true;
-        Body body = world.createBody(def);
+        Body newBody = world.createBody(def);
 
         CircleShape circleShape = new CircleShape();
-        circleShape.setRadius(Math.max(width, height) * SCALE / 2f);
+
+        circleShape.setRadius(Math.max(width, height) / 2f / SCALE);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circleShape;
@@ -69,12 +74,26 @@ public class GameObject {
         fixtureDef.friction = 1f;
         fixtureDef.filter.categoryBits = cBits;
 
-        Fixture fixture = body.createFixture(fixtureDef);
+        Fixture fixture = newBody.createFixture(fixtureDef);
         fixture.setUserData(this);
         circleShape.dispose();
 
-        body.setTransform(x * SCALE, y * SCALE, 0);
-        return body;
+
+        newBody.setTransform((x + width / 2f) / SCALE, (y + height / 2f) / SCALE, 0);
+        return newBody;
     }
 
+    public void update(float delta) {
+
+    }
+
+    public void dispose() {
+        if (texture != null) {
+            texture.dispose();
+        }
+        if (body != null && world != null && !world.isLocked()) {
+            world.destroyBody(body);
+            body = null;
+        }
+    }
 }

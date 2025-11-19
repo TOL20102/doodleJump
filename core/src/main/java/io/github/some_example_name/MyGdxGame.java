@@ -30,6 +30,7 @@ public class MyGdxGame extends Game {
     GameSession gameSession;
 
     public GameScreen gameScreen;
+    public MenuScreen menuScreen;
 
     @Override
     public void create() {
@@ -45,8 +46,9 @@ public class MyGdxGame extends Game {
         camera.setToOrtho(false, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT);
 
         gameScreen = new GameScreen(this);
+        menuScreen = new MenuScreen(this);
 
-        setScreen(gameScreen);
+        setScreen(menuScreen);
     }
     @Override
     public void dispose() {
