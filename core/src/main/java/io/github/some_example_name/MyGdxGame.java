@@ -19,18 +19,22 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import io.github.some_example_name.objects.DoodleObject;
+
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class MyGdxGame extends Game {
     public SpriteBatch batch;
     public OrthographicCamera camera;
     public World world;
     public Vector3 touch;
+    int p = 0;
     float accumulator = 0;
     GameSession gameSession;
     public BitmapFont commonWhiteFont,commonBlackFont,largeWhiteFont;
 
     public GameScreen gameScreen;
     public MenuScreen menuScreen;
+
 
     @Override
     public void create() {
@@ -60,6 +64,15 @@ public class MyGdxGame extends Game {
         if (accumulator >= STEP_TIME) {
             accumulator -= STEP_TIME;
             world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+
+
+            gameScreen.setTr(true);
+
+
         }
+        else {
+            gameScreen.setTr(false);
+        }
+
     }
 }

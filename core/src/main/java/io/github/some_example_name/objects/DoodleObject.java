@@ -7,21 +7,14 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.some_example_name.GameSettings;
 
-public class DoodleObject extends GameObject{
+public class DoodleObject extends GameObject {
     int x, y, width, height, livesLeft = 1;
     short cBits;
-    int lastX=x;
+    private float previousY = body.getPosition().y; // Инициализация в начале
+    private final float threshold = 0.02f; // Настройте по необходимости
+    // В методе update или render (например, в render() или update(float delta))
+    float currentY = body.getPosition().y;
 
-    public void jump() {
-        if (Math.abs(x-lastX)<100) {
-            body.applyForceToCenter(new Vector2(
-                    0,
-                    500 * GameSettings.SHIP_FORCE_RATIO),
-                true
-            );
-            lastX=x;
-        }
-    }
     public DoodleObject(String texturePath, int x, int y, int width, int height, short cBits, World world) {
         super(texturePath,x,y,width,height,cBits,world);
         this.width = width;
@@ -30,14 +23,21 @@ public class DoodleObject extends GameObject{
         this.x = x;
         this.y = y;
     }
+    public void jump() {
+        currentY = body.getPosition().y;
 
+        if (Math.abs(currentY - previousY) < threshold && body.getLinearVelocity().y < -5) {
+            float x = body.getPosition().x;
+            float y = body.getPosition().y;
+            body.applyLinearImpulse(0, 1000, x, y, true);
+            System.out.println(Math.abs(currentY - previousY));
+        }
+
+        previousY = currentY;
+    }
     public void move(int xs,int ys, boolean check) {
         if(check) {
-            body.applyForceToCenter(new Vector2(
-                    xs,
-                    ys),
-                true
-            );
+            body.applyForceToCenter(xs,ys, true);
         }
 
         else {
