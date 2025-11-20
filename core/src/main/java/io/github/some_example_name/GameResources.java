@@ -12,5 +12,8 @@ public class GameResources {
     public static final String BUTTON_SHORT_BG_IMG_PATH = "button_background_short.png";
     public static final String BACKGROUND_IMG_PATH = "BackgroundMenu.png";
     public static final String BUTTON_LONG_BG_IMG_PATH = "button_background_long.png";
+    public static final String BULLET_IMG_PATH = "bullet.png";
+
+
 }
 

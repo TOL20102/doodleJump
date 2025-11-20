@@ -29,6 +29,7 @@ public class MyGdxGame extends Game {
     public Vector3 touch;
     int p = 0;
     float accumulator = 0;
+    int acumm;
     GameSession gameSession;
     public BitmapFont commonWhiteFont,commonBlackFont,largeWhiteFont;
 
@@ -66,12 +67,17 @@ public class MyGdxGame extends Game {
             world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
 
-            gameScreen.setTr(true);
+            gameScreen.setTr(true ,false);
+            acumm++;
 
+            if (acumm >= 120) {
+                gameScreen.setTr(true, true);
+                acumm-=120;
+            }
 
         }
         else {
-            gameScreen.setTr(false);
+            gameScreen.setTr(false,false);
         }
 
     }

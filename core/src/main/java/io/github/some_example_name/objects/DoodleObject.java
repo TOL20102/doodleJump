@@ -4,11 +4,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import io.github.some_example_name.GameSettings;
 
 public class DoodleObject extends GameObject {
-    int x, y, width, height, livesLeft = 1;
+    int x;
+    int y;
+    int width;
+    public int height;
+    int livesLeft = 1;
     short cBits;
     private float previousY = body.getPosition().y; // Инициализация в начале
     private final float threshold = 0.02f; // Настройте по необходимости
@@ -26,7 +31,7 @@ public class DoodleObject extends GameObject {
     public void jump() {
         currentY = body.getPosition().y;
 
-        if (Math.abs(currentY - previousY) < threshold && body.getLinearVelocity().y < -5) {
+        if (Math.abs(currentY - previousY) < threshold && body.getLinearVelocity().y < -7) {
             float x = body.getPosition().x;
             float y = body.getPosition().y;
             body.applyLinearImpulse(0, 1000, x, y, true);

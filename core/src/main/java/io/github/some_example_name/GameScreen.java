@@ -14,9 +14,12 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 
+import java.util.ArrayList;
+
 import io.github.some_example_name.components.ButtonView;
 import io.github.some_example_name.components.ImageView;
 import io.github.some_example_name.components.TextView;
+import io.github.some_example_name.objects.BulletObject;
 import io.github.some_example_name.objects.DoodleObject;
 
 
@@ -25,10 +28,13 @@ public class GameScreen extends ScreenAdapter {
     ImageView backGround, topBlackoutView, fullBlackoutView;
     ButtonView buttonView, buttonView1, pauseButton, homeButton, continueButton;
     TextView pauseTextView;
+    ArrayList<BulletObject> bulletArray;
+
 
     GameSession gameSession;
     Box2DDebugRenderer debugRenderer;
     int r = 0;
+    boolean canShot, hasShot;
     Batch batch;
     public DoodleObject doodleObject;
     boolean tr;
@@ -36,6 +42,7 @@ public class GameScreen extends ScreenAdapter {
         this.myGdxGame = myGdxGame;
         batch = myGdxGame.batch;
         Box2D.init();
+        bulletArray = new ArrayList<>();
         topBlackoutView = new ImageView(0, 1180, 720, 100, GameResources.BLACKOUT_TOP_IMG_PATH);
         fullBlackoutView = new ImageView(0, 0, 720, 1280, GameResources.PAUSE_SCREEN_IMG_PATH);
         doodleObject = new DoodleObject(GameResources.DOODLE_PATH, 100, 150, 920 / 3, 552 / 3, GameSettings.DOODLE_BIT, myGdxGame.world);
@@ -48,6 +55,14 @@ public class GameScreen extends ScreenAdapter {
         pauseTextView = new TextView(myGdxGame.largeWhiteFont, 290, 950, "Pause");
         homeButton = new ButtonView(190, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Home");
         continueButton = new ButtonView(390, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Continue");
+        BulletObject laserBullet = new BulletObject(
+            1000, 100 + doodleObject.height / 2,
+            GameSettings.BULLET_WIDTH, GameSettings.BULLET_HEIGHT,
+            GameResources.BULLET_IMG_PATH,
+            myGdxGame.world,
+            0,
+            100);
+        bulletArray.add(laserBullet);
 
     }
 
@@ -59,10 +74,12 @@ public class GameScreen extends ScreenAdapter {
         }
         draw();
     }
+
     private void draw() {
         myGdxGame.camera.update();
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
         ScreenUtils.clear(Color.CLEAR);
+        updateBullets();
 
         r++;
 
@@ -74,6 +91,8 @@ public class GameScreen extends ScreenAdapter {
         pauseButton.draw(myGdxGame.batch);
         buttonView.draw(myGdxGame.batch);
         buttonView1.draw(myGdxGame.batch);
+        for (BulletObject bullet : bulletArray) bullet.draw(myGdxGame.batch);
+
         if (gameSession.state == PLAYING) {
 
         } else if (gameSession.state == PAUSED) {
@@ -87,6 +106,14 @@ public class GameScreen extends ScreenAdapter {
 
         handleInput();
     }
+    private void updateBullets() {
+        for (int i = 0; i < bulletArray.size(); i++) {
+            if (bulletArray.get(i).hasToBeDestroyed()) {
+                myGdxGame.world.destroyBody(bulletArray.get(i).body);
+                bulletArray.remove(i--);
+            }
+        }
+    }
     private void handleInput() {
         if (Gdx.input.isTouched()) {
             myGdxGame.touch = myGdxGame.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
@@ -94,14 +121,27 @@ public class GameScreen extends ScreenAdapter {
                 case PLAYING:
 
                     if (buttonView.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
-                        doodleObject.move(-100, 0, true);
+                        doodleObject.move(-100, 0, false);
                     }
                     if (buttonView1.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
-                        doodleObject.move(100, 0, true);
+                        doodleObject.move(100, 0, false);
                     }
                     if (pauseButton.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
                         gameSession.pauseGame();
                     }
+                    if (!(pauseButton.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) && !(buttonView1.isHit(myGdxGame.touch.x, myGdxGame.touch.y))
+                        && !(buttonView.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) && !(topBlackoutView.isHit(myGdxGame.touch.x,myGdxGame.touch.y)) && !hasShot) {
+                        BulletObject laserBullet = new BulletObject(
+                            doodleObject.getX(), doodleObject.getY() + doodleObject.height / 2,
+                            GameSettings.BULLET_WIDTH, GameSettings.BULLET_HEIGHT,
+                            GameResources.BULLET_IMG_PATH,
+                            myGdxGame.world,
+                            myGdxGame.touch.x,
+                            myGdxGame.touch.y);
+                        bulletArray.add(laserBullet);
+                        hasShot = true;
+
+                }
                     break;
 
                 case PAUSED:
@@ -115,5 +155,5 @@ public class GameScreen extends ScreenAdapter {
             }
         }
     }
-    public void setTr(boolean r) { tr = r;}
+    public void setTr(boolean r, boolean t) { tr = r; if (t) { hasShot = false; } }
 }

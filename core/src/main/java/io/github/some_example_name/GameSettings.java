@@ -10,6 +10,8 @@ public class GameSettings {
     public static final int POSITION_ITERATIONS = 6;
 
     public static float SHIP_FORCE_RATIO = 10;
+    public static final int BULLET_WIDTH = 20;
+    public static final int BULLET_HEIGHT = 20;
 
     public static final short DOODLE_BIT = 1;
     public static final short PLATE_BIT = 2;
