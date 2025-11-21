@@ -1,4 +1,4 @@
-package io.github.some_example_name;
+package io.github.some_example_name.Static;
 
 public class GameResources {
     public static final String DOODLE_PATH = "i.png";
@@ -15,5 +15,6 @@ public class GameResources {
     public static final String BULLET_IMG_PATH = "bullet.png";
 
 
+    public static final String JUMP_SOUND_PATH = "jump.mp3";
+    public static final String DEATH_SOUND_PATH = "death.mp3";
 }
-

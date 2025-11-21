@@ -1,27 +1,29 @@
 package io.github.some_example_name;
 
-import static io.github.some_example_name.GameSettings.POSITION_ITERATIONS;
-import static io.github.some_example_name.GameSettings.STEP_TIME;
-import static io.github.some_example_name.GameSettings.VELOCITY_ITERATIONS;
+import static io.github.some_example_name.Static.GameSettings.POSITION_ITERATIONS;
+import static io.github.some_example_name.Static.GameSettings.STEP_TIME;
+import static io.github.some_example_name.Static.GameSettings.VELOCITY_ITERATIONS;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.ScreenUtils;
 
-import io.github.some_example_name.objects.DoodleObject;
+import io.github.some_example_name.Managers.ScoreManager;
+import io.github.some_example_name.Managers.SoundManager;
+import io.github.some_example_name.Screens.GameScreen;
+import io.github.some_example_name.Screens.MenuScreen;
+import io.github.some_example_name.Screens.RecordsScreen;
+import io.github.some_example_name.Static.GameResources;
+import io.github.some_example_name.Static.GameSettings;
+import io.github.some_example_name.components.FontBuilder;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class MyGdxGame extends Game {
     public SpriteBatch batch;
     public OrthographicCamera camera;
@@ -35,7 +37,9 @@ public class MyGdxGame extends Game {
 
     public GameScreen gameScreen;
     public MenuScreen menuScreen;
-
+    public RecordsScreen recordsScreen;
+    public ScoreManager scoreManager;
+    public SoundManager soundManager;
 
     @Override
     public void create() {
@@ -49,15 +53,24 @@ public class MyGdxGame extends Game {
         largeWhiteFont = FontBuilder.generate(48, Color.WHITE, GameResources.FONT_PATH);
         commonBlackFont = FontBuilder.generate(24, Color.BLACK, GameResources.FONT_PATH);
 
+        scoreManager = new ScoreManager();
+        soundManager = new SoundManager();
+
         gameScreen = new GameScreen(this);
-        menuScreen =new MenuScreen(this);
+        menuScreen = new MenuScreen(this);
+        recordsScreen = new RecordsScreen(this);
 
         setScreen(menuScreen);
     }
+
     @Override
     public void dispose() {
         batch.dispose();
+        if (soundManager != null) {
+            soundManager.dispose();
+        }
     }
+
     public void stepWorld() {
         float delta = Gdx.graphics.getDeltaTime();
         accumulator += delta;
@@ -66,19 +79,16 @@ public class MyGdxGame extends Game {
             accumulator -= STEP_TIME;
             world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-
-            gameScreen.setTr(true ,false);
             acumm++;
-
-            if (acumm >= 120) {
-                gameScreen.setTr(true, true);
-                acumm-=120;
+            if (acumm >= 60) {
+                gameScreen.setTr(false, true);
+                acumm-=60;
+            } else {
+                gameScreen.setTr(false, false);
             }
-
         }
         else {
             gameScreen.setTr(false,false);
         }
-
     }
 }
