@@ -1,9 +1,12 @@
 package io.github.some_example_name.objects;
 
+import static java.lang.Math.abs;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 
+import io.github.some_example_name.Managers.ScoreManager;
 import io.github.some_example_name.Static.GameSettings;
 import io.github.some_example_name.MyGdxGame;
 
@@ -30,8 +33,10 @@ public class DoodleObject extends GameObject {
     private boolean facingRight = true;
     private float rotation = 0f;
     private float maxRotation = 15f;
+    ScoreManager scoreManager;
 
     private float currentCameraY = 0;
+    public int lastY;
 
     private MyGdxGame game;
 
@@ -44,7 +49,8 @@ public class DoodleObject extends GameObject {
         this.y = y;
         this.isAlive = true;
         this.game = game;
-
+        scoreManager = new ScoreManager();
+        lastY =y;
         body.setGravityScale(GameSettings.GRAVITY_SCALE);
         body.setLinearDamping(0.3f);
     }
@@ -69,6 +75,12 @@ public class DoodleObject extends GameObject {
         if (!isOnPlatform) {
             canJump = false;
         }
+    }
+    public void setLastY(int a) {lastY = a;}
+    public void chekY(int a) {if (a<=1000 && a>=-1000) {
+        scoreManager.saveScore(0);
+
+    }
     }
 
     private void handleAutoJump() {
@@ -137,7 +149,7 @@ public class DoodleObject extends GameObject {
         }
 
         float rotationSpeed = 10f * delta;
-        if (Math.abs(targetRotation - rotation) > 0.1f) {
+        if (abs(targetRotation - rotation) > 0.1f) {
             if (rotation < targetRotation) {
                 rotation = Math.min(rotation + rotationSpeed, targetRotation);
             } else {
@@ -148,7 +160,7 @@ public class DoodleObject extends GameObject {
         }
 
         if (!movingLeft && !movingRight) {
-            if (Math.abs(rotation) > 0.1f) {
+            if (abs(rotation) > 0.1f) {
                 if (rotation > 0) {
                     rotation = Math.max(0, rotation - rotationSpeed * 0.5f);
                 } else {
@@ -200,12 +212,12 @@ public class DoodleObject extends GameObject {
         } else {
             currentSpeed = currentSpeed * (1 - deceleration);
 
-            if (Math.abs(currentSpeed) < 1.0f) {
+            if (abs(currentSpeed) < 1.0f) {
                 currentSpeed = 0;
             }
         }
 
-        if (Math.abs(currentSpeed) > moveSpeed) {
+        if (abs(currentSpeed) > moveSpeed) {
             currentSpeed = Math.signum(currentSpeed) * moveSpeed;
         }
 
@@ -323,4 +335,6 @@ public class DoodleObject extends GameObject {
 
     public float getRotation() { return rotation; }
     public boolean isFacingRight() { return facingRight; }
+
+    public int getLastY() { return lastY; }
 }

@@ -20,6 +20,7 @@ import io.github.some_example_name.Managers.SoundManager;
 import io.github.some_example_name.Screens.GameScreen;
 import io.github.some_example_name.Screens.MenuScreen;
 import io.github.some_example_name.Screens.RecordsScreen;
+import io.github.some_example_name.Screens.SettingsScreen;
 import io.github.some_example_name.Static.GameResources;
 import io.github.some_example_name.Static.GameSettings;
 import io.github.some_example_name.components.FontBuilder;
@@ -32,10 +33,12 @@ public class MyGdxGame extends Game {
     int p = 0;
     float accumulator = 0;
     int acumm;
+    int acumm1;
     GameSession gameSession;
     public BitmapFont commonWhiteFont,commonBlackFont,largeWhiteFont;
 
     public GameScreen gameScreen;
+    public SettingsScreen settingsScreen;
     public MenuScreen menuScreen;
     public RecordsScreen recordsScreen;
     public ScoreManager scoreManager;
@@ -59,6 +62,7 @@ public class MyGdxGame extends Game {
         gameScreen = new GameScreen(this);
         menuScreen = new MenuScreen(this);
         recordsScreen = new RecordsScreen(this);
+        settingsScreen = new SettingsScreen(this);
 
         setScreen(menuScreen);
     }
@@ -80,11 +84,16 @@ public class MyGdxGame extends Game {
             world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
             acumm++;
+            acumm1++;
             if (acumm >= 60) {
                 gameScreen.setTr(false, true);
                 acumm-=60;
             } else {
                 gameScreen.setTr(false, false);
+            }
+            if (acumm >= 60*10) {
+                gameScreen.doodleObject.chekY(gameScreen.doodleObject.getY()-gameScreen.doodleObject.getLastY());
+                gameScreen.doodleObject.setLastY(gameScreen.doodleObject.getX());
             }
         }
         else {

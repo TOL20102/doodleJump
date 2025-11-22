@@ -1,12 +1,16 @@
 package io.github.some_example_name.Managers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 
+import java.util.ArrayList;
+
 public class ScoreManager {
     private static final String SCORE_FILE = "scores.json";
+    private static final Preferences preferences = Gdx.app.getPreferences("User saves");
     private ScoreData scoreData;
     private Json json;
 
@@ -81,5 +85,26 @@ public class ScoreManager {
 
     public int getTotalGames() {
         return scoreData.totalGames;
+    }
+    public static void saveSoundSettings(boolean isOn) {
+        preferences.putBoolean("isSoundOn", isOn);
+        preferences.flush();
+    }
+
+    public static boolean loadIsSoundOn() {
+        return preferences.getBoolean("isSoundOn", true);
+    }
+    public static void saveMusicSettings(boolean isOn) {
+        preferences.putBoolean("isMusicOn", isOn);
+        preferences.flush();
+    }
+    public static boolean loadIsMusicOn() {
+        return preferences.getBoolean("isMusicOn", true);
+    }
+    public static void saveTableOfRecords(ArrayList<Integer> table) {
+        Json json = new Json();
+        String tableInString = json.toJson(table);
+        preferences.putString("recordTable", tableInString);
+        preferences.flush();
     }
 }

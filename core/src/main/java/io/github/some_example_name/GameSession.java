@@ -17,6 +17,7 @@ public class GameSession {
     public void updateScore() {
         score = (int) (TimeUtils.millis() - sessionStartTime) / 100;
     }
+    public void setScore(int a) { score = a; }
     public int getScore() {
         return score;
     }

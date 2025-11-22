@@ -306,6 +306,7 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+
     private void resetGame() {
         System.out.println("🔄 Resetting game...");
 
