@@ -75,6 +75,7 @@ public class GameScreen extends ScreenAdapter {
 
         resetCamera();
 
+
         platformManager = new PlatformManager(myGdxGame.world);
 
         doodleObject = new DoodleObject(
@@ -102,12 +103,12 @@ public class GameScreen extends ScreenAdapter {
         pauseTextView = new TextView(myGdxGame.largeWhiteFont, 290, 950, "Pause");
         homeButton = new ButtonView(190, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Home");
         continueButton = new ButtonView(390, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Continue");
-        scoreTextView = new TextView(myGdxGame.commonWhiteFont, 20, 1250, "Score: 0");
+        scoreTextView = new TextView(myGdxGame.commonBlackFont, 20, 1250, "Score: 0");
         gameOverTextView = new TextView(myGdxGame.largeWhiteFont, 200, 700, "Game Over");
 
         totalTimeElapsed = 0;
         isTimerVisible = ScoreManager.loadTimerVisibility();
-        timerTextView = new TextView(myGdxGame.commonWhiteFont, 360, 1250, "Time: 00:00");
+        timerTextView = new TextView(myGdxGame.commonBlackFont, 360, 1250, "Time: 00:00");
 
         cameraOffsetY = 0;
         lastEnemyY = platformManager.getStartY();
@@ -182,6 +183,7 @@ public class GameScreen extends ScreenAdapter {
         handleInput();
         draw();
     }
+
 
     private String formatTime(float totalSeconds) {
         int minutes = (int) (totalSeconds / 60);
@@ -362,7 +364,9 @@ public class GameScreen extends ScreenAdapter {
                         GameSettings.BULLET_WIDTH,
                         GameSettings.BULLET_HEIGHT,
                         GameResources.BULLET_IMG_PATH,
-                        myGdxGame.world);
+                        myGdxGame.world,
+                        myGdxGame.soundManager
+                    );
                     bulletArray.add(laserBullet);
                 }
             }
@@ -379,6 +383,7 @@ public class GameScreen extends ScreenAdapter {
             if (continueButton.isHit((int)touchPos.x, (int)touchPos.y)) {
                 gameSession.resumeGame();
                 myGdxGame.setGamePaused(false);
+                myGdxGame.resetAccumulator();
                 System.out.println("Game resumed");
             }
         }
@@ -403,24 +408,30 @@ public class GameScreen extends ScreenAdapter {
     private void resetGame() {
         System.out.println("Resetting game...");
 
+        myGdxGame.disposeWorld();
+        myGdxGame.createWorld();
+
         for (BulletObject bullet : bulletArray) {
-            if (bullet.body != null) {
-                myGdxGame.world.destroyBody(bullet.body);
-            }
         }
         bulletArray.clear();
 
         for (EnemyObject enemy : enemyArray) {
-            if (enemy.body != null) {
-                myGdxGame.world.destroyBody(enemy.body);
-            }
         }
         enemyArray.clear();
 
         platformManager.dispose();
         platformManager = new PlatformManager(myGdxGame.world);
 
-        doodleObject.respawn();
+        doodleObject = new DoodleObject(
+            GameResources.DOODLE_PATH,
+            GameSettings.SCREEN_WIDTH / 2,
+            (int) platformManager.getStartY(),
+            GameSettings.DOODLE_WIDTH,
+            GameSettings.DOODLE_HEIGHT,
+            GameSettings.DOODLE_BIT,
+            myGdxGame.world,
+            myGdxGame
+        );
 
         contactManager = new ContactManager(myGdxGame.world, doodleObject, myGdxGame);
 
@@ -461,5 +472,8 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         platformManager.dispose();
+        if (backGround != null) {
+            backGround.dispose();
+        }
     }
 }
