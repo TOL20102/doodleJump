@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.some_example_name.Managers.ScoreManager;
 import io.github.some_example_name.Managers.SoundManager;
+import io.github.some_example_name.Managers.AchievementManager;
 import io.github.some_example_name.Screens.GameScreen;
 import io.github.some_example_name.Screens.MenuScreen;
 import io.github.some_example_name.Screens.RecordsScreen;
@@ -40,6 +41,7 @@ public class MyGdxGame extends Game {
     public RecordsScreen recordsScreen;
     public ScoreManager scoreManager;
     public SoundManager soundManager;
+    public AchievementManager achievementManager;
 
     @Override
     public void create() {
@@ -55,6 +57,11 @@ public class MyGdxGame extends Game {
 
         scoreManager = new ScoreManager();
         soundManager = new SoundManager();
+        achievementManager = new AchievementManager();
+
+        if (!achievementManager.isAchievementUnlocked("welcome")) {
+            achievementManager.unlockAchievement("welcome");
+        }
 
         gameScreen = new GameScreen(this);
         menuScreen = new MenuScreen(this);

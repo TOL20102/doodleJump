@@ -29,8 +29,7 @@ public class RecordsScreen extends ScreenAdapter {
 
         highScoreView = new TextView(myGdxGame.commonWhiteFont, 200, 900, "");
         lastScoreView = new TextView(myGdxGame.commonWhiteFont, 200, 800, "");
-        minScoreView = new TextView(myGdxGame.commonWhiteFont, 200, 700, "");
-        totalGamesView = new TextView(myGdxGame.commonWhiteFont, 200, 600, "");
+        totalGamesView = new TextView(myGdxGame.commonWhiteFont, 200, 700, "");
 
         backButton = new ButtonView(140, 400, 440, 70, myGdxGame.commonBlackFont,
             GameResources.BUTTON_LONG_BG_IMG_PATH, "Back");
@@ -57,7 +56,6 @@ public class RecordsScreen extends ScreenAdapter {
 
         highScoreView.setText("High Score: " + scores.highScore);
         lastScoreView.setText("Last Score: " + scores.lastScore);
-        minScoreView.setText("Min Score: " + (scores.totalGames > 0 ? scores.minScore : 0));
         totalGamesView.setText("Total Games: " + scores.totalGames);
     }
 
@@ -75,7 +73,6 @@ public class RecordsScreen extends ScreenAdapter {
         titleView.draw(myGdxGame.batch);
         highScoreView.draw(myGdxGame.batch);
         lastScoreView.draw(myGdxGame.batch);
-        minScoreView.draw(myGdxGame.batch);
         totalGamesView.draw(myGdxGame.batch);
         backButton.draw(myGdxGame.batch);
 
@@ -98,7 +95,6 @@ public class RecordsScreen extends ScreenAdapter {
         titleView.dispose();
         highScoreView.dispose();
         lastScoreView.dispose();
-        minScoreView.dispose();
         totalGamesView.dispose();
         backButton.dispose();
     }

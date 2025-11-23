@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.some_example_name.Static.GameSettings;
 import io.github.some_example_name.MyGdxGame;
+import io.github.some_example_name.Managers.AchievementManager;
 
 public class DoodleObject extends GameObject {
     int x;
@@ -19,6 +20,17 @@ public class DoodleObject extends GameObject {
     private float jumpCooldown = 0;
     private boolean isAlive = true;
     private boolean wasOnPlatform = false;
+
+    private int jumpCount = 0;
+    private float maxHeight = 0;
+    private int currentScore = 0;
+
+    private int lastEnemySpawnScore = 0;
+    private static final int ENEMY_SPAWN_THRESHOLD = 2000;
+    private boolean isFirstEnemySpawned = false;
+
+
+    private static final int SCORE_DIFFICULTY_FACTOR = 5;
 
     private boolean movingLeft = false;
     private boolean movingRight = false;
@@ -47,6 +59,7 @@ public class DoodleObject extends GameObject {
 
         body.setGravityScale(GameSettings.GRAVITY_SCALE);
         body.setLinearDamping(0.3f);
+        this.maxHeight = getStartY();
     }
 
     public void updateCameraPosition(float cameraY) {
@@ -62,12 +75,49 @@ public class DoodleObject extends GameObject {
         updateRotation(delta);
         handleScreenWrap();
 
+        float currentY = getY();
+        if (currentY > maxHeight) {
+            maxHeight = currentY;
+        }
+
+        float startY = getStartY();
+        currentScore = (int) (Math.max(0, maxHeight - startY) / SCORE_DIFFICULTY_FACTOR);
+
+        checkHeightAchievements();
+        checkEnemySpawn();
+
         if (jumpCooldown > 0) {
             jumpCooldown -= delta;
         }
 
         if (!isOnPlatform) {
             canJump = false;
+        }
+    }
+
+    private void checkEnemySpawn() {
+        if (currentScore - lastEnemySpawnScore >= ENEMY_SPAWN_THRESHOLD) {
+            if (game.gameScreen != null) {
+                game.gameScreen.spawnNewEnemy();
+
+                if (!isFirstEnemySpawned && game.achievementManager != null) {
+                    game.achievementManager.unlockAchievement("first_enemy");
+                    isFirstEnemySpawned = true;
+                }
+            }
+            lastEnemySpawnScore = currentScore;
+        }
+    }
+
+    private void checkHeightAchievements() {
+        if (game == null || game.achievementManager == null) return;
+
+        if (currentScore >= 1000 && !game.achievementManager.isAchievementUnlocked("height_100")) {
+            game.achievementManager.unlockAchievement("height_100");
+        }
+
+        if (currentScore >= 500 && !game.achievementManager.isAchievementUnlocked("height_500")) {
+            game.achievementManager.unlockAchievement("height_500");
         }
     }
 
@@ -87,6 +137,11 @@ public class DoodleObject extends GameObject {
         isOnPlatform = false;
         wasOnPlatform = true;
         jumpCooldown = 0.2f;
+
+        jumpCount++;
+        if (jumpCount == 1 && game != null && game.achievementManager != null) {
+            game.achievementManager.unlockAchievement("first_jump");
+        }
 
         if (game != null && game.soundManager != null) {
             game.soundManager.playJumpSound();
@@ -306,6 +361,12 @@ public class DoodleObject extends GameObject {
         currentCameraY = 0;
         rotation = 0f;
         facingRight = true;
+        jumpCount = 0;
+        maxHeight = getStartY();
+        currentScore = 0;
+        lastEnemySpawnScore = 0;
+        isFirstEnemySpawned = false;
+
         System.out.println("🔄 Doodle respawned!");
     }
 
@@ -316,6 +377,8 @@ public class DoodleObject extends GameObject {
     public boolean isOnPlatform() {
         return isOnPlatform;
     }
+
+    public int getCurrentScore() { return currentScore; }
 
     public boolean isMovingLeft() { return movingLeft; }
     public boolean isMovingRight() { return movingRight; }

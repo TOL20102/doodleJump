@@ -14,12 +14,11 @@ public class GameSession {
     public GameSession() {
         state = GameState.PLAYING;
     }
-    public void updateScore() {
-        score = (int) (TimeUtils.millis() - sessionStartTime) / 100;
-    }
+
     public int getScore() {
         return score;
     }
+
     public void startGame() {
         sessionStartTime = TimeUtils.millis();
         state = GameState.PLAYING;
@@ -29,12 +28,13 @@ public class GameSession {
         state = GameState.PAUSED;
         pauseStartTime = TimeUtils.millis();
     }
+
     public void resumeGame() {
         state = GameState.PLAYING;
         sessionStartTime += TimeUtils.millis() - pauseStartTime;
     }
+
     public void endGame() {
-        updateScore();
         state = GameState.ENDED;
     }
 }

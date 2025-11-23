@@ -15,6 +15,9 @@ public class GameResources {
     public static final String BULLET_IMG_PATH = "bullet.png";
 
 
+    public static final String TRASH_PATH = "trash.png";
+
+
     public static final String JUMP_SOUND_PATH = "jump.mp3";
     public static final String DEATH_SOUND_PATH = "death.mp3";
 }

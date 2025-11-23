@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.github.some_example_name.Achievement;
 
@@ -16,10 +18,15 @@ public class AchievementManager {
     private Json json;
     private FileHandle saveFile;
 
+    private List<Achievement> activeAchievements;
+    private static final float ACHIEVEMENT_HEIGHT_OFFSET = 100f;
+    private static final float INITIAL_Y = 700f;
+
     public AchievementManager() {
         this.achievements = new HashMap<>();
         this.json = new Json();
         this.json.setOutputType(JsonWriter.OutputType.json);
+        this.activeAchievements = new ArrayList<>();
 
         if (Gdx.files.isLocalStorageAvailable()) {
             saveFile = Gdx.files.local("achievements.json");
@@ -34,8 +41,12 @@ public class AchievementManager {
     private void initializeAchievements() {
         addAchievement(new Achievement("welcome", "Welcome!", "First time playing"));
         addAchievement(new Achievement("first_jump", "First Jump", "Make first jump"));
-        addAchievement(new Achievement("height_100", "Height 100", "Reach height 100"));
+        addAchievement(new Achievement("height_100", "Height 1000", "Reach height 1000"));
         addAchievement(new Achievement("height_500", "Height 500", "Reach height 500"));
+
+
+        addAchievement(new Achievement("first_enemy", "First Enemy", "Encounter first enemy"));
+        addAchievement(new Achievement("first_kill", "First Kill", "Defeat first enemy with a shot"));
     }
 
     public void addAchievement(Achievement achievement) {
@@ -47,7 +58,16 @@ public class AchievementManager {
         if (achievement != null) {
             if (!achievement.unlocked) {
                 achievement.unlocked = true;
+
+                float yPos = INITIAL_Y;
+                for (Achievement active : activeAchievements) {
+                    yPos -= ACHIEVEMENT_HEIGHT_OFFSET;
+                }
+                achievement.setYPosition(yPos);
+
                 achievement.show();
+
+                activeAchievements.add(achievement);
 
                 Gdx.app.log("ACHIEVEMENT", "Разблокировано: " + achievement.title);
 
@@ -56,7 +76,6 @@ public class AchievementManager {
                 try {
                     Gdx.input.vibrate(200);
                 } catch (Exception e) {
-
                 }
             }
         }
@@ -70,18 +89,33 @@ public class AchievementManager {
     }
 
     public void update(float delta) {
-        for (Achievement achievement : achievements.values()) {
+
+        for (int i = activeAchievements.size() - 1; i >= 0; i--) {
+            Achievement achievement = activeAchievements.get(i);
             achievement.update(delta);
+
+            if (!achievement.isShowing) {
+                activeAchievements.remove(i);
+                repositionActiveAchievements();
+            }
         }
     }
+
+    private void repositionActiveAchievements() {
+        float yPos = INITIAL_Y;
+        for (Achievement active : activeAchievements) {
+            active.setYPosition(yPos);
+            yPos -= ACHIEVEMENT_HEIGHT_OFFSET;
+        }
+    }
+
 
     public void draw(Batch batch, BitmapFont font) {
         if (font == null) return;
 
-        for (Achievement achievement : achievements.values()) {
-            if (achievement.isShowing) {
-                achievement.draw(batch, font);
-            }
+
+        for (Achievement achievement : activeAchievements) {
+            achievement.draw(batch, font);
         }
     }
 
