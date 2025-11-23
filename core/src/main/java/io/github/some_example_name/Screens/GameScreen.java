@@ -12,8 +12,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import io.github.some_example_name.Managers.ContactManager;
 import io.github.some_example_name.Static.GameResources;
@@ -26,6 +28,8 @@ import io.github.some_example_name.components.ImageView;
 import io.github.some_example_name.components.TextView;
 import io.github.some_example_name.objects.BulletObject;
 import io.github.some_example_name.objects.DoodleObject;
+import io.github.some_example_name.objects.EnemyObject;
+import io.github.some_example_name.Managers.AchievementManager;
 
 public class GameScreen extends ScreenAdapter {
     MyGdxGame myGdxGame;
@@ -33,6 +37,7 @@ public class GameScreen extends ScreenAdapter {
     ButtonView buttonView, buttonView1, pauseButton, homeButton, continueButton;
     TextView pauseTextView, scoreTextView, gameOverTextView;
     ArrayList<BulletObject> bulletArray;
+    ArrayList<EnemyObject> enemyArray;
 
     GameSession gameSession;
     Box2DDebugRenderer debugRenderer;
@@ -47,6 +52,7 @@ public class GameScreen extends ScreenAdapter {
     private float cameraOffsetY;
     private float respawnTimer = 0;
     private boolean waitingForRespawn = false;
+    private float lastEnemyY = 0;
 
     private OrthographicCamera uiCamera;
 
@@ -58,6 +64,7 @@ public class GameScreen extends ScreenAdapter {
         batch = myGdxGame.batch;
         Box2D.init();
         bulletArray = new ArrayList<>();
+        enemyArray = new ArrayList<>();
 
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(false, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT);
@@ -77,7 +84,7 @@ public class GameScreen extends ScreenAdapter {
             myGdxGame
         );
 
-        contactManager = new ContactManager(myGdxGame.world, doodleObject);
+        contactManager = new ContactManager(myGdxGame.world, doodleObject, myGdxGame);
 
         topBlackoutView = new ImageView(0, 1180, 720, 100, GameResources.BLACKOUT_TOP_IMG_PATH);
         fullBlackoutView = new ImageView(0, 0, 720, 1280, GameResources.PAUSE_SCREEN_IMG_PATH);
@@ -95,6 +102,7 @@ public class GameScreen extends ScreenAdapter {
         gameOverTextView = new TextView(myGdxGame.largeWhiteFont, 200, 700, "Game Over");
 
         cameraOffsetY = 0;
+        lastEnemyY = platformManager.getStartY();
     }
 
     private void resetCamera() {
@@ -111,6 +119,8 @@ public class GameScreen extends ScreenAdapter {
         resetCamera();
         cameraOffsetY = 0;
 
+        myGdxGame.batch.setColor(Color.WHITE);
+
         if (!doodleObject.isAlive()) {
             restartGame();
         }
@@ -120,6 +130,10 @@ public class GameScreen extends ScreenAdapter {
     public void render(float delta) {
         myGdxGame.stepWorld();
 
+        if (myGdxGame.achievementManager != null) {
+            myGdxGame.achievementManager.update(delta);
+        }
+
         if (doodleObject.isAlive() && gameSession.state == PLAYING) {
             doodleObject.updateCameraPosition(cameraOffsetY);
             doodleObject.update(delta);
@@ -127,8 +141,9 @@ public class GameScreen extends ScreenAdapter {
             platformManager.update(delta, cameraOffsetY, doodleObject);
             doodleObject.updateMovement();
 
-            gameSession.updateScore();
             updateBullets();
+
+            updateEnemies(delta, doodleObject.getX(), doodleObject.getY());
 
             respawnTimer = 0;
             waitingForRespawn = false;
@@ -150,6 +165,7 @@ public class GameScreen extends ScreenAdapter {
         draw();
     }
 
+
     private void updateCamera() {
         if (!doodleObject.isAlive() || gameSession.state == PAUSED) return;
 
@@ -163,6 +179,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void draw() {
+        myGdxGame.batch.setColor(Color.WHITE);
         ScreenUtils.clear(Color.CLEAR);
 
         uiCamera.update();
@@ -181,6 +198,10 @@ public class GameScreen extends ScreenAdapter {
             doodleObject.draw(myGdxGame.batch);
         }
 
+        for (EnemyObject enemy : enemyArray) {
+            enemy.draw(myGdxGame.batch);
+        }
+
         for (BulletObject bullet : bulletArray) {
             bullet.draw(myGdxGame.batch);
         }
@@ -191,12 +212,13 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.batch.setProjectionMatrix(uiCamera.combined);
         myGdxGame.batch.begin();
 
+        myGdxGame.batch.setColor(Color.WHITE);
         topBlackoutView.draw(myGdxGame.batch);
         pauseButton.draw(myGdxGame.batch);
         buttonView.draw(myGdxGame.batch);
         buttonView1.draw(myGdxGame.batch);
 
-        scoreTextView.setText("Score: " + gameSession.getScore());
+        scoreTextView.setText("Score: " + doodleObject.getCurrentScore());
         scoreTextView.draw(myGdxGame.batch);
 
         if (gameSession.state == PAUSED) {
@@ -216,17 +238,56 @@ public class GameScreen extends ScreenAdapter {
             gameOverTextView.draw(myGdxGame.batch);
         }
 
+        if (myGdxGame.achievementManager != null) {
+            myGdxGame.achievementManager.draw(myGdxGame.batch, myGdxGame.commonWhiteFont);
+        }
+
         myGdxGame.batch.end();
     }
 
     private void updateBullets() {
         for (int i = 0; i < bulletArray.size(); i++) {
-            if (bulletArray.get(i).hasToBeDestroyed()) {
-                myGdxGame.world.destroyBody(bulletArray.get(i).body);
+            BulletObject bullet = bulletArray.get(i);
+
+            bullet.setCurrentCameraY(cameraOffsetY);
+
+            if (bullet.hasToBeDestroyed()) {
+                myGdxGame.world.destroyBody(bullet.body);
                 bulletArray.remove(i--);
             }
         }
     }
+
+    private void updateEnemies(float delta, float doodleX, float doodleY) {
+        Iterator<EnemyObject> iterator = enemyArray.iterator();
+        while (iterator.hasNext()) {
+            EnemyObject enemy = iterator.next();
+
+            enemy.update(delta, doodleX, doodleY);
+
+            if (enemy.hasToBeDestroyed()) {
+                myGdxGame.world.destroyBody(enemy.body);
+                iterator.remove();
+            }
+        }
+    }
+
+    public void spawnNewEnemy() {
+        float spawnY = myGdxGame.camera.position.y + GameSettings.SCREEN_HEIGHT / 2 + 100f;
+        float spawnX = MathUtils.random(EnemyObject.ENEMY_WIDTH / 2f, GameSettings.SCREEN_WIDTH - EnemyObject.ENEMY_WIDTH / 2f);
+
+        EnemyObject newEnemy = new EnemyObject(
+            GameResources.TRASH_PATH,
+            spawnX,
+            spawnY,
+            myGdxGame.world
+        );
+        enemyArray.add(newEnemy);
+        lastEnemyY = spawnY;
+
+        System.out.println("👾 Enemy spawned at: (" + spawnX + ", " + spawnY + ")");
+    }
+
 
     private void handleInput() {
         Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -257,11 +318,11 @@ public class GameScreen extends ScreenAdapter {
                     gameSession.pauseGame();
                     System.out.println("⏸️ Game paused");
                 }
+
                 if (!(pauseButton.isHit((int)touchPos.x, (int)touchPos.y)) &&
                     !(buttonView1.isHit((int)touchPos.x, (int)touchPos.y)) &&
                     !(buttonView.isHit((int)touchPos.x, (int)touchPos.y)) &&
-                    !(topBlackoutView.isHit((int)touchPos.x, (int)touchPos.y)) &&
-                    !hasShot) {
+                    !(topBlackoutView.isHit((int)touchPos.x, (int)touchPos.y))) {
 
                     BulletObject laserBullet = new BulletObject(
                         doodleObject.getX(),
@@ -271,7 +332,6 @@ public class GameScreen extends ScreenAdapter {
                         GameResources.BULLET_IMG_PATH,
                         myGdxGame.world);
                     bulletArray.add(laserBullet);
-                    hasShot = true;
                 }
             }
         }
@@ -299,13 +359,12 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void saveCurrentScore() {
-        int currentScore = gameSession.getScore();
+        int currentScore = doodleObject.getCurrentScore();
         if (currentScore > 0) {
             myGdxGame.scoreManager.saveScore(currentScore);
             System.out.println("Score saved: " + currentScore);
         }
     }
-
 
     private void resetGame() {
         System.out.println("🔄 Resetting game...");
@@ -317,12 +376,19 @@ public class GameScreen extends ScreenAdapter {
         }
         bulletArray.clear();
 
+        for (EnemyObject enemy : enemyArray) {
+            if (enemy.body != null) {
+                myGdxGame.world.destroyBody(enemy.body);
+            }
+        }
+        enemyArray.clear();
+
         platformManager.dispose();
         platformManager = new PlatformManager(myGdxGame.world);
 
         doodleObject.respawn();
 
-        contactManager = new ContactManager(myGdxGame.world, doodleObject);
+        contactManager = new ContactManager(myGdxGame.world, doodleObject, myGdxGame);
 
         resetCamera();
         cameraOffsetY = 0;
@@ -334,8 +400,8 @@ public class GameScreen extends ScreenAdapter {
         respawnTimer = 0;
         leftButtonPressed = false;
         rightButtonPressed = false;
-        hasShot = false;
         tr = false;
+        lastEnemyY = platformManager.getStartY();
 
         System.out.println("Game reset complete!");
     }
@@ -343,7 +409,7 @@ public class GameScreen extends ScreenAdapter {
     private void restartGame() {
         System.out.println("Auto-restarting game...");
 
-        int finalScore = gameSession.getScore();
+        int finalScore = doodleObject.getCurrentScore();
         if (finalScore > 0) {
             myGdxGame.scoreManager.saveScore(finalScore);
             System.out.println("Final score saved: " + finalScore);
@@ -354,9 +420,6 @@ public class GameScreen extends ScreenAdapter {
 
     public void setTr(boolean r, boolean t) {
         tr = r;
-        if (t) {
-            hasShot = false;
-        }
     }
 
     @Override

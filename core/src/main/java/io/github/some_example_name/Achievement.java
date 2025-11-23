@@ -2,6 +2,7 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 
 public class Achievement {
@@ -12,11 +13,20 @@ public class Achievement {
     public float showTimer;
     public boolean isShowing;
 
-    private static final float SHOW_DURATION = 3.0f;
+    private static final float SHOW_DURATION = 3.5f;
     private static final float ANIMATION_DURATION = 0.5f;
+    private static final float PADDING = 15f;
+
+    private float screenWidth = 720f;
     private float startX;
+    private float targetX;
+    private float endX;
     private float currentX;
     private float y;
+
+
+    private float bgWidth = 350f;
+    private float bgHeight = 80f;
 
     public Achievement(String id, String title, String description) {
         this.id = id;
@@ -25,26 +35,42 @@ public class Achievement {
         this.unlocked = false;
         this.showTimer = 0;
         this.isShowing = false;
+
+
+        this.startX = screenWidth + 10;
+        this.targetX = screenWidth - bgWidth - 20;
+        this.endX = screenWidth + 10;
+
+        this.currentX = startX;
+    }
+
+
+    public void setYPosition(float y) {
+        this.y = y;
     }
 
     public void show() {
         this.unlocked = true;
         this.isShowing = true;
         this.showTimer = SHOW_DURATION;
-        this.startX = 800f;
         this.currentX = startX;
-        this.y = 700f;
     }
 
     public void update(float delta) {
         if (isShowing) {
             showTimer -= delta;
 
+            float timeElapsed = SHOW_DURATION - showTimer;
 
-            float targetX = 50f;
-            float progress = 1.0f - (showTimer / SHOW_DURATION);
-            currentX = Interpolation.bounceOut.apply(startX, targetX,
-                Math.min(1.0f, progress * 2f));
+            if (timeElapsed < ANIMATION_DURATION) {
+                float progress = timeElapsed / ANIMATION_DURATION;
+                currentX = Interpolation.pow3Out.apply(startX, targetX, progress);
+            } else if (showTimer > ANIMATION_DURATION) {
+                currentX = targetX;
+            } else {
+                float progress = 1.0f - (showTimer / ANIMATION_DURATION);
+                currentX = Interpolation.pow3In.apply(targetX, endX, progress);
+            }
 
             if (showTimer <= 0) {
                 isShowing = false;
@@ -69,18 +95,23 @@ public class Achievement {
         }
 
 
-        batch.setColor(0.2f, 0.2f, 0.8f, alpha * 0.8f);
+        Color oldBatchColor = batch.getColor();
 
 
-
-        font.setColor(1, 1, 1, alpha);
-        font.draw(batch, "★ Достижение разблокировано!", currentX, y + 60);
-        font.draw(batch, title, currentX, y + 30);
-        font.draw(batch, description, currentX, y);
+        font.setColor(0, 0, 0, alpha);
 
 
-        batch.setColor(1, 1, 1, 1);
-        font.setColor(1, 1, 1, 1);
+        float textX = currentX + PADDING;
+        float titleY = y + bgHeight - PADDING;
+        float descY = y + PADDING + 10;
+
+
+        font.draw(batch, "★ Achievement unlocked!", textX, titleY);
+        font.draw(batch, title, textX, titleY - 20);
+        font.draw(batch, description, textX, descY);
+
+        font.setColor(Color.WHITE);
+        batch.setColor(oldBatchColor);
     }
 
     @Override

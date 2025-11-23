@@ -1,6 +1,5 @@
 package io.github.some_example_name.Managers;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.World;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,7 +15,6 @@ public class PlatformManager {
     private float highestPlatformY;
     private float cameraY;
     private Random random;
-    int removedCount = 0;
 
     private PlateObject floorPlatform;
     private float lastSpawnHeight;
@@ -99,9 +97,10 @@ public class PlatformManager {
 
 
         Iterator<PlateObject> iterator = platforms.iterator();
+        int removedCount = 0;
         while (iterator.hasNext()) {
             PlateObject platform = iterator.next();
-            if (platform != floorPlatform && platform.getY() < cameraY-100) {
+            if (platform != floorPlatform && platform.getY() < cameraY - 1500) {
                 if (platform.body != null) {
                     world.destroyBody(platform.body);
                 }
@@ -109,7 +108,7 @@ public class PlatformManager {
                 removedCount++;
             }
         }
-        System.out.println(removedCount);
+
 
         spawnPlatformsAsNeeded(currentCameraY);
     }

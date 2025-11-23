@@ -17,10 +17,11 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.some_example_name.Managers.ScoreManager;
 import io.github.some_example_name.Managers.SoundManager;
+import io.github.some_example_name.Managers.AchievementManager;
+import io.github.some_example_name.Screens.AchievementScreen;
 import io.github.some_example_name.Screens.GameScreen;
 import io.github.some_example_name.Screens.MenuScreen;
 import io.github.some_example_name.Screens.RecordsScreen;
-import io.github.some_example_name.Screens.SettingsScreen;
 import io.github.some_example_name.Static.GameResources;
 import io.github.some_example_name.Static.GameSettings;
 import io.github.some_example_name.components.FontBuilder;
@@ -33,16 +34,16 @@ public class MyGdxGame extends Game {
     int p = 0;
     float accumulator = 0;
     int acumm;
-    int acumm1;
     GameSession gameSession;
     public BitmapFont commonWhiteFont,commonBlackFont,largeWhiteFont;
 
     public GameScreen gameScreen;
-    public SettingsScreen settingsScreen;
     public MenuScreen menuScreen;
     public RecordsScreen recordsScreen;
     public ScoreManager scoreManager;
     public SoundManager soundManager;
+    public AchievementScreen achievementScreen;
+    public AchievementManager achievementManager;
 
     @Override
     public void create() {
@@ -58,11 +59,16 @@ public class MyGdxGame extends Game {
 
         scoreManager = new ScoreManager();
         soundManager = new SoundManager();
+        achievementManager = new AchievementManager();
+
+        if (!achievementManager.isAchievementUnlocked("welcome")) {
+            achievementManager.unlockAchievement("welcome");
+        }
 
         gameScreen = new GameScreen(this);
         menuScreen = new MenuScreen(this);
         recordsScreen = new RecordsScreen(this);
-        settingsScreen = new SettingsScreen(this);
+        achievementScreen = new AchievementScreen(this);
 
         setScreen(menuScreen);
     }
@@ -84,16 +90,11 @@ public class MyGdxGame extends Game {
             world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
             acumm++;
-            acumm1++;
             if (acumm >= 60) {
                 gameScreen.setTr(false, true);
                 acumm-=60;
             } else {
                 gameScreen.setTr(false, false);
-            }
-            if (acumm >= 60*10) {
-                gameScreen.doodleObject.chekY(gameScreen.doodleObject.getY()-gameScreen.doodleObject.getLastY());
-                gameScreen.doodleObject.setLastY(gameScreen.doodleObject.getX());
             }
         }
         else {
