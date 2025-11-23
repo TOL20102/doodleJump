@@ -19,6 +19,8 @@ public class PlatformManager {
     private PlateObject floorPlatform;
     private float lastSpawnHeight;
 
+    private static final float MOVING_PLATFORM_CHANCE = 0.1f;
+
     public PlatformManager(World world) {
         this.world = world;
         this.platforms = new ArrayList<>();
@@ -34,7 +36,7 @@ public class PlatformManager {
 
         float floorY = 150;
         floorPlatform = new PlateObject(floorY, GameSettings.SCREEN_WIDTH * 0.9f,
-            GameSettings.PLATFORM_HEIGHT * 2f, GameSettings.PLATE_BIT, world, GameSettings.SCREEN_WIDTH);
+            GameSettings.PLATFORM_HEIGHT * 2f, GameSettings.PLATE_BIT, world, GameSettings.SCREEN_WIDTH, false);
         platforms.add(floorPlatform);
 
 
@@ -75,8 +77,10 @@ public class PlatformManager {
             float maxX = GameSettings.SCREEN_WIDTH - width / 2f - 20f;
             float randomX = minX + random.nextFloat() * (maxX - minX);
 
+            boolean isMoving = random.nextFloat() < MOVING_PLATFORM_CHANCE;
 
-            PlateObject platform = createPlatformAtPosition(randomX, y, width, height);
+
+            PlateObject platform = createPlatformAtPosition(randomX, y, width, height, isMoving);
             platforms.add(platform);
             highestPlatformY = Math.max(highestPlatformY, y);
         } catch (Exception e) {
@@ -85,8 +89,8 @@ public class PlatformManager {
     }
 
 
-    private PlateObject createPlatformAtPosition(float x, float y, float width, float height) {
-        PlateObject platform = new PlateObject(y, width, height, GameSettings.PLATE_BIT, world, GameSettings.SCREEN_WIDTH);
+    private PlateObject createPlatformAtPosition(float x, float y, float width, float height, boolean isMoving) {
+        PlateObject platform = new PlateObject(y, width, height, GameSettings.PLATE_BIT, world, GameSettings.SCREEN_WIDTH, isMoving);
 
         platform.body.setTransform(x * GameSettings.SCALE, y * GameSettings.SCALE, 0);
         return platform;
@@ -94,6 +98,10 @@ public class PlatformManager {
 
     public void update(float delta, float currentCameraY, DoodleObject doodle) {
         this.cameraY = currentCameraY;
+
+        for (PlateObject platform : platforms) {
+            platform.update(delta);
+        }
 
 
         Iterator<PlateObject> iterator = platforms.iterator();
@@ -115,10 +123,11 @@ public class PlatformManager {
 
     private void spawnPlatformsAsNeeded(float currentCameraY) {
 
-        float spawnTriggerHeight = lastSpawnHeight - 600f;
+
+        float spawnTriggerHeight = lastSpawnHeight - 500f;
 
         if (currentCameraY > spawnTriggerHeight) {
-            int platformsToSpawn = 2 + random.nextInt(3);
+            int platformsToSpawn = 3 + random.nextInt(3);
             float currentY = highestPlatformY;
 
             for (int i = 0; i < platformsToSpawn; i++) {
@@ -139,7 +148,7 @@ public class PlatformManager {
         float lookAheadHeight = currentCameraY + GameSettings.SCREEN_HEIGHT * 1.0f;
 
         if (highestPlatformY < lookAheadHeight) {
-            int additionalPlatforms = 3;
+            int additionalPlatforms = 4;
             float currentY = highestPlatformY;
 
             for (int i = 0; i < additionalPlatforms; i++) {

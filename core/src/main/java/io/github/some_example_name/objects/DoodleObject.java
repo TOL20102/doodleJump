@@ -112,6 +112,10 @@ public class DoodleObject extends GameObject {
     private void checkHeightAchievements() {
         if (game == null || game.achievementManager == null) return;
 
+        if (currentScore >= 5000 && !game.achievementManager.isAchievementUnlocked("height_5000")) {
+            game.achievementManager.unlockAchievement("height_5000");
+        }
+
         if (currentScore >= 1000 && !game.achievementManager.isAchievementUnlocked("height_100")) {
             game.achievementManager.unlockAchievement("height_100");
         }

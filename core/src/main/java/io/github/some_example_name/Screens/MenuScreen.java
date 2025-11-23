@@ -17,17 +17,35 @@ public class MenuScreen extends ScreenAdapter {
     MyGdxGame myGdxGame;
     ImageView backgroundView;
     TextView titleView;
-    ButtonView startButtonView, recordsButtonView, settingsButtonView, exitButtonView;
+    ButtonView startButtonView, recordsButtonView, settingsButtonView, achievementsButtonView, exitButtonView;
+    ButtonView authorsButtonView; // <-- Новая кнопка
 
     public MenuScreen(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
 
         backgroundView = new ImageView(0, 0, 720, 1280, GameResources.BACKGROUND_IMG_PATH);
         titleView = new TextView(myGdxGame.largeWhiteFont, 180, 960, "Doodle Jump");
+
         startButtonView = new ButtonView(140, 646, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "start");
-        recordsButtonView = new ButtonView(140, 551, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "records");
-        settingsButtonView = new ButtonView(140, 456, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "achievements");
-        exitButtonView = new ButtonView(140, 361, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "exit");
+        recordsButtonView = new ButtonView(140, 561, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "records");
+
+        settingsButtonView = new ButtonView(140, 476, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "settings");
+
+        achievementsButtonView = new ButtonView(140, 391, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "achievements");
+
+        exitButtonView = new ButtonView(140, 306, 440, 70, myGdxGame.commonBlackFont, GameResources.BUTTON_LONG_BG_IMG_PATH, "exit");
+
+        // Кнопка Авторов: маленькая, квадратная, с буквой 'A'. Размещаем внизу слева.
+        float buttonSize = 70;
+        authorsButtonView = new ButtonView(
+            140, // x: Левый край
+            200, // y: Ниже кнопки exit
+            buttonSize,
+            buttonSize,
+            myGdxGame.largeWhiteFont, // Используем largeWhiteFont для буквы 'A'
+            GameResources.BUTTON_SHORT_BG_IMG_PATH, // Используем короткий фон для квадратной кнопки
+            "A" // Текст на кнопке
+        );
     }
 
     @Override
@@ -52,10 +70,13 @@ public class MenuScreen extends ScreenAdapter {
 
         backgroundView.draw(myGdxGame.batch);
         titleView.draw(myGdxGame.batch);
+
         exitButtonView.draw(myGdxGame.batch);
+        achievementsButtonView.draw(myGdxGame.batch);
         settingsButtonView.draw(myGdxGame.batch);
         recordsButtonView.draw(myGdxGame.batch);
         startButtonView.draw(myGdxGame.batch);
+        authorsButtonView.draw(myGdxGame.batch); // <-- Отрисовка новой кнопки
 
         myGdxGame.batch.end();
     }
@@ -73,19 +94,31 @@ public class MenuScreen extends ScreenAdapter {
             if (exitButtonView.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
                 Gdx.app.exit();
             }
+
             if (settingsButtonView.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
+                myGdxGame.setScreen(myGdxGame.settingsScreen);
+            }
+
+            if (achievementsButtonView.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) {
                 myGdxGame.setScreen(myGdxGame.achievementScreen);
+            }
+
+            if (authorsButtonView.isHit(myGdxGame.touch.x, myGdxGame.touch.y)) { // <-- Обработка новой кнопки
+                myGdxGame.setScreen(myGdxGame.authorsScreen);
             }
         }
     }
+
 
     @Override
     public void dispose() {
         backgroundView.dispose();
         titleView.dispose();
         exitButtonView.dispose();
+        achievementsButtonView.dispose();
         settingsButtonView.dispose();
         recordsButtonView.dispose();
         startButtonView.dispose();
+        authorsButtonView.dispose(); // <-- Освобождение ресурса
     }
 }

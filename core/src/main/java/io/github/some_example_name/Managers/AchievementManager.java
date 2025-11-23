@@ -43,6 +43,7 @@ public class AchievementManager {
         addAchievement(new Achievement("first_jump", "First Jump", "Make first jump"));
         addAchievement(new Achievement("height_100", "Height 1000", "Reach height 1000"));
         addAchievement(new Achievement("height_500", "Height 500", "Reach height 500"));
+        addAchievement(new Achievement("height_5000", "Height 5000", "Reach height 5000"));
 
 
         addAchievement(new Achievement("first_enemy", "First Enemy", "Encounter first enemy"));
@@ -91,6 +92,17 @@ public class AchievementManager {
     public List<Achievement> getAchievements() {
         return new ArrayList<>(achievements.values());
     }
+
+    public void clearAchievements() {
+        for (Achievement achievement : achievements.values()) {
+            achievement.unlocked = false;
+        }
+        activeAchievements.clear();
+        Gdx.app.log("ACHIEVEMENT", "Все достижения сброшены.");
+        saveAchievements();
+        loadAchievements();
+    }
+
 
     public void update(float delta) {
 

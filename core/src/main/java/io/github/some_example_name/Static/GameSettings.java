@@ -11,7 +11,6 @@ public class GameSettings {
     public static final int VELOCITY_ITERATIONS = 6;
     public static final int POSITION_ITERATIONS = 6;
 
-    public static float SHIP_FORCE_RATIO = 10;
     public static final int BULLET_WIDTH = 50;
     public static final int BULLET_HEIGHT = 50;
 
@@ -34,10 +33,5 @@ public class GameSettings {
 
     public static final float DOODLE_JUMP_FORCE = 78f;
     public static final float GRAVITY_SCALE = 2.8f;
-    public static final float MAX_JUMP_HEIGHT = 800f;
 
-
-    public static final float PLATFORM_SPACING = 220f;
-    public static final float MIN_PLATFORM_SPACING = 200f;
-    public static final float MAX_PLATFORM_SPACING = 280f;
 }

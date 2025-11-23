@@ -23,7 +23,7 @@ public class EnemyObject extends GameObject {
     private float moveTimer = 0f;
 
     private boolean isAggro = false;
-    private static final float AGGRO_TIME = 5.0f;
+    private static final float AGGRO_TIME = 10.0f;
     private float aggroTimer = AGGRO_TIME;
     private static final float AGGRO_SPEED = 50f;
     private static final float EDGE_BUFFER = 10f;

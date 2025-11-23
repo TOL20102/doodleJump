@@ -23,6 +23,7 @@ import io.github.some_example_name.GameSession;
 import io.github.some_example_name.Static.GameSettings;
 import io.github.some_example_name.MyGdxGame;
 import io.github.some_example_name.Managers.PlatformManager;
+import io.github.some_example_name.Managers.ScoreManager;
 import io.github.some_example_name.components.ButtonView;
 import io.github.some_example_name.components.ImageView;
 import io.github.some_example_name.components.TextView;
@@ -35,7 +36,7 @@ public class GameScreen extends ScreenAdapter {
     MyGdxGame myGdxGame;
     ImageView backGround, topBlackoutView, fullBlackoutView;
     ButtonView buttonView, buttonView1, pauseButton, homeButton, continueButton;
-    TextView pauseTextView, scoreTextView, gameOverTextView;
+    TextView pauseTextView, scoreTextView, gameOverTextView, timerTextView;
     ArrayList<BulletObject> bulletArray;
     ArrayList<EnemyObject> enemyArray;
 
@@ -53,6 +54,9 @@ public class GameScreen extends ScreenAdapter {
     private float respawnTimer = 0;
     private boolean waitingForRespawn = false;
     private float lastEnemyY = 0;
+
+    private float totalTimeElapsed;
+    private boolean isTimerVisible;
 
     private OrthographicCamera uiCamera;
 
@@ -101,6 +105,10 @@ public class GameScreen extends ScreenAdapter {
         scoreTextView = new TextView(myGdxGame.commonWhiteFont, 20, 1250, "Score: 0");
         gameOverTextView = new TextView(myGdxGame.largeWhiteFont, 200, 700, "Game Over");
 
+        totalTimeElapsed = 0;
+        isTimerVisible = ScoreManager.loadTimerVisibility();
+        timerTextView = new TextView(myGdxGame.commonWhiteFont, 360, 1250, "Time: 00:00");
+
         cameraOffsetY = 0;
         lastEnemyY = platformManager.getStartY();
     }
@@ -124,21 +132,31 @@ public class GameScreen extends ScreenAdapter {
         if (!doodleObject.isAlive()) {
             restartGame();
         }
+
+        isTimerVisible = ScoreManager.loadTimerVisibility();
+
+        if (gameSession.state == PLAYING) {
+            myGdxGame.setGamePaused(false);
+        }
     }
 
     @Override
     public void render(float delta) {
         myGdxGame.stepWorld();
 
-        if (myGdxGame.achievementManager != null) {
-            myGdxGame.achievementManager.update(delta);
-        }
-
         if (doodleObject.isAlive() && gameSession.state == PLAYING) {
+
+            if (myGdxGame.achievementManager != null) {
+                myGdxGame.achievementManager.update(delta);
+            }
+            totalTimeElapsed += delta;
+
             doodleObject.updateCameraPosition(cameraOffsetY);
             doodleObject.update(delta);
             updateCamera();
+
             platformManager.update(delta, cameraOffsetY, doodleObject);
+
             doodleObject.updateMovement();
 
             updateBullets();
@@ -147,8 +165,8 @@ public class GameScreen extends ScreenAdapter {
 
             respawnTimer = 0;
             waitingForRespawn = false;
-        } else if (doodleObject.isAlive() && gameSession.state == PAUSED) {
-        } else {
+        }
+        else if (!doodleObject.isAlive()) {
             if (!waitingForRespawn) {
                 waitingForRespawn = true;
                 respawnTimer = 0;
@@ -163,6 +181,12 @@ public class GameScreen extends ScreenAdapter {
 
         handleInput();
         draw();
+    }
+
+    private String formatTime(float totalSeconds) {
+        int minutes = (int) (totalSeconds / 60);
+        int seconds = (int) (totalSeconds % 60);
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
 
@@ -221,6 +245,11 @@ public class GameScreen extends ScreenAdapter {
         scoreTextView.setText("Score: " + doodleObject.getCurrentScore());
         scoreTextView.draw(myGdxGame.batch);
 
+        if (isTimerVisible) {
+            timerTextView.setText("Time: " + formatTime(totalTimeElapsed));
+            timerTextView.draw(myGdxGame.batch);
+        }
+
         if (gameSession.state == PAUSED) {
             fullBlackoutView.draw(myGdxGame.batch);
             pauseTextView.draw(myGdxGame.batch);
@@ -263,7 +292,9 @@ public class GameScreen extends ScreenAdapter {
         while (iterator.hasNext()) {
             EnemyObject enemy = iterator.next();
 
-            enemy.update(delta, doodleX, doodleY);
+            if (gameSession.state == PLAYING) {
+                enemy.update(delta, doodleX, doodleY);
+            }
 
             if (enemy.hasToBeDestroyed()) {
                 myGdxGame.world.destroyBody(enemy.body);
@@ -316,6 +347,7 @@ public class GameScreen extends ScreenAdapter {
             if (Gdx.input.justTouched()) {
                 if (pauseButton.isHit((int)touchPos.x, (int)touchPos.y)) {
                     gameSession.pauseGame();
+                    myGdxGame.setGamePaused(true);
                     System.out.println("Game paused");
                 }
 
@@ -341,10 +373,12 @@ public class GameScreen extends ScreenAdapter {
                 saveCurrentScore();
                 resetGame();
                 resetCamera();
+                myGdxGame.setGamePaused(false);
                 myGdxGame.setScreen(myGdxGame.menuScreen);
             }
             if (continueButton.isHit((int)touchPos.x, (int)touchPos.y)) {
                 gameSession.resumeGame();
+                myGdxGame.setGamePaused(false);
                 System.out.println("Game resumed");
             }
         }
@@ -402,6 +436,8 @@ public class GameScreen extends ScreenAdapter {
         rightButtonPressed = false;
         tr = false;
         lastEnemyY = platformManager.getStartY();
+
+        totalTimeElapsed = 0;
 
         System.out.println("Game reset complete!");
     }
