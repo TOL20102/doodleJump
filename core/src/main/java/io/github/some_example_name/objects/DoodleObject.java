@@ -147,7 +147,7 @@ public class DoodleObject extends GameObject {
             game.soundManager.playJumpSound();
         }
 
-        System.out.println("🦘 JUMP! Force: " + GameSettings.DOODLE_JUMP_FORCE);
+
     }
 
     private void checkDeath() {
@@ -158,7 +158,7 @@ public class DoodleObject extends GameObject {
 
         if (getY() < deathThreshold) {
             die();
-            System.out.println("💀 DIED - Fell below camera! Doodle Y: " + getY());
+
             return;
         }
 
@@ -225,9 +225,9 @@ public class DoodleObject extends GameObject {
                 this.canJump = true;
                 this.jumpCooldown = 0;
                 this.wasOnPlatform = false;
-                System.out.println("✅ Landed on platform at Y: " + getY() + ", VelY: " + velocityY);
+                System.out.println("Landed on platform at Y: " + getY() + ", VelY: " + velocityY);
             } else {
-                System.out.println("🚫 Platform contact ignored - jumping up: " + velocityY);
+                System.out.println("Platform contact ignored - jumping up: " + velocityY);
             }
         } else {
             this.isOnPlatform = false;
@@ -344,7 +344,7 @@ public class DoodleObject extends GameObject {
             game.soundManager.playDeathSound();
         }
 
-        System.out.println("💀 DOODLE DIED at position: (" + getX() + ", " + getY() + ")");
+        System.out.println("DOODLE DIED at position: (" + getX() + ", " + getY() + ")");
     }
 
     public void respawn() {
@@ -367,7 +367,7 @@ public class DoodleObject extends GameObject {
         lastEnemySpawnScore = 0;
         isFirstEnemySpawned = false;
 
-        System.out.println("🔄 Doodle respawned!");
+        System.out.println("Doodle respawned!");
     }
 
     public float getStartY() {

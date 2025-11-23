@@ -106,7 +106,7 @@ public class Achievement {
         float descY = y + PADDING + 10;
 
 
-        font.draw(batch, "★ Achievement unlocked!", textX, titleY);
+        font.draw(batch, "Achievement unlocked!", textX, titleY);
         font.draw(batch, title, textX, titleY - 20);
         font.draw(batch, description, textX, descY);
 

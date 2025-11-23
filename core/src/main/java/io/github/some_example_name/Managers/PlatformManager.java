@@ -51,7 +51,7 @@ public class PlatformManager {
         highestPlatformY = currentY;
         lastSpawnHeight = highestPlatformY;
 
-        System.out.println("Created " + platforms.size() + " initial platforms, highest: " + highestPlatformY);
+
     }
 
     private float getRandomSpacing() {
@@ -80,7 +80,7 @@ public class PlatformManager {
             platforms.add(platform);
             highestPlatformY = Math.max(highestPlatformY, y);
         } catch (Exception e) {
-            System.err.println("Error creating platform at y=" + y + ": " + e.getMessage());
+
         }
     }
 
@@ -128,7 +128,7 @@ public class PlatformManager {
             }
 
             lastSpawnHeight = highestPlatformY;
-            System.out.println("Spawned " + platformsToSpawn + " new platforms up to: " + highestPlatformY);
+
         }
 
 
@@ -148,7 +148,7 @@ public class PlatformManager {
                 createPlatform(currentY, getRandomPlatformWidth(), GameSettings.PLATFORM_HEIGHT);
             }
 
-            System.out.println("Added " + additionalPlatforms + " emergency platforms up to: " + highestPlatformY);
+
         }
     }
 

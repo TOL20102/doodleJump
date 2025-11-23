@@ -84,12 +84,10 @@ public class ContactManager implements ContactListener {
         if (enemy.getHealth() <= 0 && game != null && game.achievementManager != null) {
             game.achievementManager.unlockAchievement("first_kill");
         }
-        System.out.println("🔥 Enemy hit by bullet (Box2D)");
     }
 
     private void handleDoodleEnemyContact(DoodleObject doodle, EnemyObject enemy) {
         doodle.die();
-        System.out.println("💀 Doodle hit enemy!");
     }
 
     @Override

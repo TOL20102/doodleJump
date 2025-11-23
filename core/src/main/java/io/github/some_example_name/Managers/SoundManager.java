@@ -20,9 +20,9 @@ public class SoundManager {
         try {
             jumpSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.JUMP_SOUND_PATH));
             deathSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.DEATH_SOUND_PATH));
-            System.out.println("✅ Sounds loaded successfully");
+
         } catch (Exception e) {
-            System.err.println("❌ Error loading sounds: " + e.getMessage());
+
             soundsEnabled = false;
         }
     }

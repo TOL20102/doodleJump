@@ -152,7 +152,7 @@ public class GameScreen extends ScreenAdapter {
             if (!waitingForRespawn) {
                 waitingForRespawn = true;
                 respawnTimer = 0;
-                System.out.println("💀 Waiting for respawn...");
+                System.out.println("Waiting for respawn...");
             }
 
             respawnTimer += delta;
@@ -285,7 +285,7 @@ public class GameScreen extends ScreenAdapter {
         enemyArray.add(newEnemy);
         lastEnemyY = spawnY;
 
-        System.out.println("👾 Enemy spawned at: (" + spawnX + ", " + spawnY + ")");
+        System.out.println(" Enemy spawned at: (" + spawnX + ", " + spawnY + ")");
     }
 
 
@@ -316,7 +316,7 @@ public class GameScreen extends ScreenAdapter {
             if (Gdx.input.justTouched()) {
                 if (pauseButton.isHit((int)touchPos.x, (int)touchPos.y)) {
                     gameSession.pauseGame();
-                    System.out.println("⏸️ Game paused");
+                    System.out.println("Game paused");
                 }
 
                 if (!(pauseButton.isHit((int)touchPos.x, (int)touchPos.y)) &&
@@ -345,7 +345,7 @@ public class GameScreen extends ScreenAdapter {
             }
             if (continueButton.isHit((int)touchPos.x, (int)touchPos.y)) {
                 gameSession.resumeGame();
-                System.out.println("▶️ Game resumed");
+                System.out.println("Game resumed");
             }
         }
 
@@ -367,7 +367,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void resetGame() {
-        System.out.println("🔄 Resetting game...");
+        System.out.println("Resetting game...");
 
         for (BulletObject bullet : bulletArray) {
             if (bullet.body != null) {

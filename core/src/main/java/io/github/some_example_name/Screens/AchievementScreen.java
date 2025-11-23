@@ -16,10 +16,8 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
 
-// ИМПОРТЫ (Убедитесь, что пути совпадают с вашим проектом)
 import io.github.some_example_name.MyGdxGame;
 import io.github.some_example_name.Achievement;
-// Обратите внимание: пакет GameResources должен совпадать с тем, где он у вас лежит (Static или utils)
 import io.github.some_example_name.Static.GameResources;
 import io.github.some_example_name.Static.GameSettings;
 import io.github.some_example_name.components.ButtonView;
@@ -30,10 +28,10 @@ public class AchievementScreen extends ScreenAdapter {
     private Stage stage;
     private Texture backgroundTexture;
 
-    // Кастомная кнопка
+
     private ButtonView exitButton;
 
-    // Стили для текста
+
     private Label.LabelStyle titleStyle;
     private Label.LabelStyle nameStyle;
     private Label.LabelStyle descStyle;
@@ -44,20 +42,17 @@ public class AchievementScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        // 0. Инициализируем Stage каждый раз при показе экрана
+
         this.stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        // 1. Загружаем фон
-        try {
-            backgroundTexture = new Texture(Gdx.files.internal(GameResources.BACKGROUND_IMG_PATH));
-        } catch (Exception e) {
-            Gdx.app.error("AchievementScreen", "Не удалось загрузить фон: " + e.getMessage());
-        }
+
+        backgroundTexture = new Texture(Gdx.files.internal(GameResources.BACKGROUND_IMG_PATH));
+
 
         prepareStyles();
 
-        // 2. Создаем кнопку выхода
+
         float btnWidth = 250;
         float btnHeight = 80;
         float btnX = (Gdx.graphics.getWidth() - btnWidth) / 2;
@@ -66,12 +61,12 @@ public class AchievementScreen extends ScreenAdapter {
         exitButton = new ButtonView(
             btnX, btnY,
             btnWidth, btnHeight,
-            game.commonWhiteFont,
+            game.commonBlackFont,
             GameResources.BUTTON_LONG_BG_IMG_PATH,
             "BACK"
         );
 
-        // 3. Главная таблица
+
         Table mainTable = new Table();
         mainTable.setFillParent(true);
 
@@ -79,11 +74,11 @@ public class AchievementScreen extends ScreenAdapter {
         titleLabel.setAlignment(Align.center);
         mainTable.add(titleLabel).padTop(50).padBottom(30).row();
 
-        // Таблица контента (внутри скролла)
+
         Table contentTable = new Table();
         contentTable.top();
 
-        // --- Загрузка данных ---
+
         if (game.achievementManager != null) {
             List<Achievement> achievements = game.achievementManager.getAchievements();
 
@@ -181,7 +176,7 @@ public class AchievementScreen extends ScreenAdapter {
 
                 if (game.menuScreen != null) {
                     game.setScreen(game.menuScreen);
-                    dispose(); // Вызываем dispose для очистки фона и stage
+                    dispose();
                 } else {
                     Gdx.app.log("AchievementScreen", "MenuScreen is null!");
                 }
@@ -206,14 +201,6 @@ public class AchievementScreen extends ScreenAdapter {
             backgroundTexture.dispose();
             backgroundTexture = null;
         }
-        // ВАЖНО: Мы НЕ удаляем exitButton здесь, так как ButtonView.dispose()
-        // ошибочно удаляет общий шрифт игры (commonWhiteFont).
-        // Если вы раскомментируете это, игра сломается при перезаходе.
 
-        /* if (exitButton != null) {
-            exitButton.dispose();
-            exitButton = null;
-        }
-        */
     }
 }

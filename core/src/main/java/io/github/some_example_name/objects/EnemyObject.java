@@ -61,14 +61,14 @@ public class EnemyObject extends GameObject {
         if (doodleY > getY() + ENEMY_HEIGHT * 0.75f) {
             isAggro = true;
             aggroTimer = 0;
-            System.out.println("⚠️ Enemy AGGRO: Doodle passed by Y.");
+            System.out.println("Enemy AGGRO: Doodle passed by Y.");
             return;
         }
 
         aggroTimer -= delta;
         if (aggroTimer <= 0) {
             isAggro = true;
-            System.out.println("⚠️ Enemy AGGRO: Time limit expired.");
+            System.out.println("Enemy AGGRO: Time limit expired.");
         }
     }
 
@@ -140,7 +140,7 @@ public class EnemyObject extends GameObject {
     public void die() {
         if (!isAlive) return;
         isAlive = false;
-        System.out.println("💥 Enemy destroyed!");
+        System.out.println("Enemy destroyed!");
     }
 
     public void hit(int damage) {
