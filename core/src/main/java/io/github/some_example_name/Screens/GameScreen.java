@@ -119,6 +119,8 @@ public class GameScreen extends ScreenAdapter {
         resetCamera();
         cameraOffsetY = 0;
 
+        myGdxGame.batch.setColor(Color.WHITE);
+
         if (!doodleObject.isAlive()) {
             restartGame();
         }
@@ -177,6 +179,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void draw() {
+        myGdxGame.batch.setColor(Color.WHITE);
         ScreenUtils.clear(Color.CLEAR);
 
         uiCamera.update();
@@ -209,6 +212,7 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.batch.setProjectionMatrix(uiCamera.combined);
         myGdxGame.batch.begin();
 
+        myGdxGame.batch.setColor(Color.WHITE);
         topBlackoutView.draw(myGdxGame.batch);
         pauseButton.draw(myGdxGame.batch);
         buttonView.draw(myGdxGame.batch);
@@ -243,8 +247,12 @@ public class GameScreen extends ScreenAdapter {
 
     private void updateBullets() {
         for (int i = 0; i < bulletArray.size(); i++) {
-            if (bulletArray.get(i).hasToBeDestroyed()) {
-                myGdxGame.world.destroyBody(bulletArray.get(i).body);
+            BulletObject bullet = bulletArray.get(i);
+
+            bullet.setCurrentCameraY(cameraOffsetY);
+
+            if (bullet.hasToBeDestroyed()) {
+                myGdxGame.world.destroyBody(bullet.body);
                 bulletArray.remove(i--);
             }
         }
@@ -254,6 +262,7 @@ public class GameScreen extends ScreenAdapter {
         Iterator<EnemyObject> iterator = enemyArray.iterator();
         while (iterator.hasNext()) {
             EnemyObject enemy = iterator.next();
+
             enemy.update(delta, doodleX, doodleY);
 
             if (enemy.hasToBeDestroyed()) {
@@ -373,6 +382,7 @@ public class GameScreen extends ScreenAdapter {
             }
         }
         enemyArray.clear();
+
         platformManager.dispose();
         platformManager = new PlatformManager(myGdxGame.world);
 

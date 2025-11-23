@@ -26,6 +26,7 @@ public class EnemyObject extends GameObject {
     private static final float AGGRO_TIME = 5.0f;
     private float aggroTimer = AGGRO_TIME;
     private static final float AGGRO_SPEED = 50f;
+    private static final float EDGE_BUFFER = 10f;
 
     public EnemyObject(String texturePath, float x, float y, World world) {
         super(texturePath, (int)x, (int)y, ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_BIT, world);
@@ -98,9 +99,17 @@ public class EnemyObject extends GameObject {
             currentSpeed = movingRight ? moveSpeed : -moveSpeed;
             targetVelocity.set(currentSpeed, 0);
 
-            if (getX() < ENEMY_WIDTH / 2f + 5 || getX() > GameSettings.SCREEN_WIDTH - ENEMY_WIDTH / 2f - 5) {
+            float xPos = getX();
+            float halfWidth = ENEMY_WIDTH / 2f;
+            float screenRight = GameSettings.SCREEN_WIDTH - halfWidth - EDGE_BUFFER;
+            float screenLeft = halfWidth + EDGE_BUFFER;
+
+            if ((xPos <= screenLeft && !movingRight) || (xPos >= screenRight && movingRight)) {
+
                 movingRight = !movingRight;
                 moveTimer = MOVE_CHANGE_INTERVAL;
+                currentSpeed = movingRight ? moveSpeed : -moveSpeed;
+                targetVelocity.set(currentSpeed, 0);
             }
         }
 
@@ -114,6 +123,7 @@ public class EnemyObject extends GameObject {
     public void draw(SpriteBatch batch) {
         if (isAlive) {
             Color oldColor = batch.getColor();
+
             if (isAggro) {
                 batch.setColor(1f, 0.5f, 0.5f, 1f);
             }

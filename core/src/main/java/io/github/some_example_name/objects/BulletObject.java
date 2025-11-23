@@ -6,20 +6,22 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.some_example_name.Static.GameSettings;
 
-
 public class BulletObject extends GameObject {
 
     private boolean hasToBeDestroyed = false;
     private static final float BULLET_SPEED = 500f;
-    private static final float DESPAWN_Y = 2000;
-
+    private static final float DESPAWN_CAMERA_OFFSET = GameSettings.SCREEN_HEIGHT * 2.5f;
+    private float currentCameraY = 0;
     public BulletObject(float x, float y, int width, int height, String texturePath, World world) {
         super(texturePath, (int)x, (int)y, width, height, GameSettings.BULLET_BIT, world);
-
 
         body.setGravityScale(0);
         body.setBullet(true);
         body.setLinearVelocity(new Vector2(0, BULLET_SPEED));
+    }
+
+    public void setCurrentCameraY(float cameraY) {
+        this.currentCameraY = cameraY;
     }
 
     public void setHasToBeDestroyed(boolean destroy) {
@@ -27,7 +29,10 @@ public class BulletObject extends GameObject {
     }
 
     public boolean hasToBeDestroyed() {
-        return hasToBeDestroyed || getY() > DESPAWN_Y;
+        float cameraCenterY = currentCameraY + GameSettings.SCREEN_HEIGHT / 2f;
+        float despawnHeight = cameraCenterY + DESPAWN_CAMERA_OFFSET;
+
+        return hasToBeDestroyed || getY() > despawnHeight;
     }
 
     @Override

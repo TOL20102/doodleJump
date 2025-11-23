@@ -26,7 +26,6 @@ public class ContactManager implements ContactListener {
         world.setContactListener(this);
     }
 
-
     @Override
     public void beginContact(Contact contact) {
         Object objA = contact.getFixtureA().getUserData();
@@ -44,7 +43,6 @@ public class ContactManager implements ContactListener {
     }
 
     private void handleContact(Object objA, Object objB, boolean begin) {
-        // 1. Doodle и Platform
         if (objA instanceof DoodleObject && objB instanceof PlateObject) {
             handlePlatformContact((DoodleObject) objA, (PlateObject) objB, begin);
         } else if (objB instanceof DoodleObject && objA instanceof PlateObject) {
@@ -68,7 +66,6 @@ public class ContactManager implements ContactListener {
 
     private void handlePlatformContact(DoodleObject doodle, PlateObject platform, boolean begin) {
         if (begin) {
-
             float doodleVelocityY = doodle.body.getLinearVelocity().y;
 
             if (doodleVelocityY <= 2f) {
@@ -80,7 +77,9 @@ public class ContactManager implements ContactListener {
     }
 
     private void handleBulletEnemyContact(BulletObject bullet, EnemyObject enemy) {
-        enemy.hit(1);
+        enemy.hit(2);
+
+        bullet.setHasToBeDestroyed(true);
 
         if (enemy.getHealth() <= 0 && game != null && game.achievementManager != null) {
             game.achievementManager.unlockAchievement("first_kill");
@@ -123,20 +122,16 @@ public class ContactManager implements ContactListener {
 
         if ((objA instanceof DoodleObject && objB instanceof EnemyObject) ||
             (objB instanceof DoodleObject && objA instanceof EnemyObject)) {
-
             contact.setEnabled(false);
         }
 
-
         if ((objA instanceof BulletObject && objB instanceof EnemyObject) ||
             (objB instanceof BulletObject && objA instanceof EnemyObject)) {
-
             contact.setEnabled(true);
         }
     }
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
-
     }
 }
