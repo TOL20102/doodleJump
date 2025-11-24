@@ -1,4 +1,4 @@
-package io.github.some_example_name;
+package io.github.some_example_name.components;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

@@ -1,7 +1,6 @@
 package io.github.some_example_name.Screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -25,10 +24,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import io.github.some_example_name.MyGdxGame;
-import io.github.some_example_name.Achievement;
+import io.github.some_example_name.components.Achievement;
 import io.github.some_example_name.Static.GameResources;
 import io.github.some_example_name.Static.GameSettings;
-import io.github.some_example_name.components.ButtonView;
 
 public class AchievementScreen extends ScreenAdapter {
 

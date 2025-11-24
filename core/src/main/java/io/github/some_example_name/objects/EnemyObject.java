@@ -12,8 +12,6 @@ public class EnemyObject extends GameObject {
     public static final int ENEMY_WIDTH = 120;
     public static final int ENEMY_HEIGHT = 120;
     public static final short ENEMY_BIT = 4;
-
-    // --- Константы для путей текстур ---
     private static final String TRASH_PATH = "trash.png";
     private static final String TRASH_PATH2 = "trash2.png";
 
@@ -23,11 +21,9 @@ public class EnemyObject extends GameObject {
 
     private Texture aggroTexture;
 
-    // --- ЛОГИКА ДЛЯ АНИМАЦИИ (постоянное переключение текстур) ---
-    private static final float TEXTURE_SWITCH_INTERVAL = 0.25f; // Интервал смены текстуры
+    private static final float TEXTURE_SWITCH_INTERVAL = 0.25f;
     private float textureTimer = 0f;
     private boolean useAlternateTexture = false;
-    // --- КОНЕЦ ЛОГИКИ АНИМАЦИИ ---
 
     private float moveSpeed = 5f;
     private float currentSpeed = 0f;
@@ -42,14 +38,11 @@ public class EnemyObject extends GameObject {
     private static final float EDGE_BUFFER = 10f;
 
     public EnemyObject(String texturePath, float x, float y, World world) {
-        // Вызываем конструктор родителя с основной текстурой (TRASH_PATH)
         super(TRASH_PATH, (int)x, (int)y, ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_BIT, world);
         this.isAlive = true;
         this.wasHit = false;
 
-        // --- Загрузка текстуры для режима AGGRO (TRASH_PATH2) ---
         try {
-            // Пытаемся загрузить вторую текстуру
             this.aggroTexture = new Texture(TRASH_PATH2);
             if (this.aggroTexture == this.texture) {
                 System.err.println("WARNING: aggroTexture is identical to default texture. Check loading path or error handling.");
@@ -68,14 +61,11 @@ public class EnemyObject extends GameObject {
 
     public void update(float delta, float doodleX, float doodleY) {
         if (!isAlive) return;
-
-        // --- ЛОГИКА АНИМАЦИИ: Постоянное переключение текстур ---
         textureTimer += delta;
         if (textureTimer >= TEXTURE_SWITCH_INTERVAL) {
             useAlternateTexture = !useAlternateTexture;
             textureTimer = 0;
         }
-        // --- КОНЕЦ ЛОГИКИ АНИМАЦИИ ---
 
         checkAggroConditions(delta, doodleX, doodleY);
 
@@ -90,10 +80,8 @@ public class EnemyObject extends GameObject {
     }
 
     private void checkAggroConditions(float delta, float doodleX, float doodleY) {
-        // Если уже в агрессии, ничего не делаем
         if (isAggro) return;
 
-        // Условие 1: Doodle перепрыгнул врага
         if (doodleY > getY() + ENEMY_HEIGHT * 0.75f) {
             isAggro = true;
             aggroTimer = 0;
@@ -101,7 +89,6 @@ public class EnemyObject extends GameObject {
             return;
         }
 
-        // Условие 2: Время ожидания истекло
         aggroTimer -= delta;
         if (aggroTimer <= 0) {
             isAggro = true;
@@ -153,10 +140,6 @@ public class EnemyObject extends GameObject {
         body.setLinearVelocity(targetVelocity.x, targetVelocity.y);
     }
 
-    public void setPosition(float x, float y) {
-        // Этот метод не должен быть пустым, если он используется для Box2D,
-        // но оставим его пустым, как в вашем исходном коде
-    }
 
     @Override
     public void draw(SpriteBatch batch) {
@@ -165,21 +148,19 @@ public class EnemyObject extends GameObject {
 
             Texture currentTexture;
 
-            // 1. ВЫБОР ТЕКСТУРЫ: Выбор основан на таймере для постоянной анимации
             if (useAlternateTexture) {
-                currentTexture = this.aggroTexture; // trash2.png
+                currentTexture = this.aggroTexture;
             } else {
-                currentTexture = this.texture; // trash.png
+                currentTexture = this.texture;
             }
 
-            // 2. ЦВЕТ: Остается связанным с режимом AGGRO
             if (isAggro) {
-                batch.setColor(1f, 0.5f, 0.5f, 1f); // Красный оттенок в режиме AGGRO
+                batch.setColor(1f, 0.5f, 0.5f, 1f);
             } else {
-                batch.setColor(Color.WHITE); // Обычный цвет
+                batch.setColor(Color.WHITE);
             }
 
-            batch.draw(currentTexture, // Рисуем выбранную текстуру
+            batch.draw(currentTexture,
                 getX() - ENEMY_WIDTH/1.6f ,
                 getY() - ENEMY_HEIGHT/1.6f ,
                 ENEMY_WIDTH *1.25f, ENEMY_HEIGHT*1.25f);
@@ -191,19 +172,16 @@ public class EnemyObject extends GameObject {
     public void die() {
         if (!isAlive) return;
         isAlive = false;
-        System.out.println("Enemy destroyed!");
+        System.out.println("Enemy destroyed");
     }
 
     public void hit(int damage) {
         this.health -= damage;
         this.wasHit = true;
 
-        // --- ИЗМЕНЕНИЕ: УДАЛЕНА АКТИВАЦИЯ AGGRO ПОСЛЕ ПОПАДАНИЯ ---
-        // Теперь isAggro активируется только через checkAggroConditions
-        // (когда Doodle перепрыгнет врага или по таймеру).
-        // ---
 
-        System.out.println("Enemy hit! HP left: " + this.health);
+
+        System.out.println("Enemy hit HP left: " + this.health);
     }
 
     public void setWasHit(boolean hit) {

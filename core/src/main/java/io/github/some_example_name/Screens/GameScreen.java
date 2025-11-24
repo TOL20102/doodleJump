@@ -44,9 +44,6 @@ public class GameScreen extends ScreenAdapter {
     Box2DDebugRenderer debugRenderer;
     PlatformManager platformManager;
     ContactManager contactManager;
-
-    int r = 0;
-    boolean canShot, hasShot;
     Batch batch;
     public DoodleObject doodleObject;
     boolean tr;

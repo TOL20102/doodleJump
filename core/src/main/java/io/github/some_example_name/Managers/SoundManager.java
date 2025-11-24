@@ -30,9 +30,9 @@ public class SoundManager {
             jumpSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.JUMP_SOUND_PATH));
             deathSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.DEATH_SOUND_PATH));
             shotSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.ZVuk_Vistrila));
-            System.out.println("✅ Sounds loaded successfully");
+            System.out.println(" Sounds loaded successfully");
         } catch (Exception e) {
-            System.err.println("❌ Error loading sounds: " + e.getMessage());
+            System.err.println(" Error loading sounds: " + e.getMessage());
             soundsEnabled = false;
         }
     }
@@ -42,9 +42,9 @@ public class SoundManager {
             backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(GameResources.BACKGROUND_MUSIC_PATH));
             backgroundMusic.setLooping(true);
             backgroundMusic.setVolume(volume * 0.5f);
-            System.out.println("✅ Background music loaded successfully");
+            System.out.println(" Background music loaded successfully");
         } catch (Exception e) {
-            System.err.println("❌ Error loading background music: " + e.getMessage());
+            System.err.println(" Error loading background music: " + e.getMessage());
         }
     }
 

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.some_example_name.Achievement;
+import io.github.some_example_name.components.Achievement;
 
 public class AchievementManager {
     private HashMap<String, Achievement> achievements;
