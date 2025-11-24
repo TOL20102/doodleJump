@@ -62,7 +62,6 @@ public class GameScreen extends ScreenAdapter {
 
     private boolean leftButtonPressed = false;
     private boolean rightButtonPressed = false;
-
     public GameScreen(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
         batch = myGdxGame.batch;
@@ -103,12 +102,12 @@ public class GameScreen extends ScreenAdapter {
         pauseTextView = new TextView(myGdxGame.largeWhiteFont, 290, 950, "Pause");
         homeButton = new ButtonView(190, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Home");
         continueButton = new ButtonView(390, 750, 160, 70, myGdxGame.commonWhiteFont, GameResources.BUTTON_SHORT_BG_IMG_PATH, "Continue");
-        scoreTextView = new TextView(myGdxGame.commonBlackFont, 20, 1250, "Score: 0");
+        scoreTextView = new TextView(myGdxGame.commonWhiteFont, 20, 1250, "Score: 0");
         gameOverTextView = new TextView(myGdxGame.largeWhiteFont, 200, 700, "Game Over");
 
         totalTimeElapsed = 0;
         isTimerVisible = ScoreManager.loadTimerVisibility();
-        timerTextView = new TextView(myGdxGame.commonBlackFont, 360, 1250, "Time: 00:00");
+        timerTextView = new TextView(myGdxGame.commonWhiteFont, 360, 1250, "Time: 00:00");
 
         cameraOffsetY = 0;
         lastEnemyY = platformManager.getStartY();
